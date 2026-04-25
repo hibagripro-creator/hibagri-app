@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="theme-color" content="#0d2610"/>
+<meta name="description" content="منصة فلاحية جزائرية لتأجير المعدات والنقل والمستلزمات"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22%D9%87%D9%8A%D8%A8%D8%A7%D8%BA%D8%B1%D9%8A%22%2C%22short_name%22%3A%22HibaAgri%22%2C%22theme_color%22%3A%22%230d2610%22%2C%22background_color%22%3A%22%23f4f7f4%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%22%7D"/>
+<title>هيباغري — المنصة الفلاحية الجزائرية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --g1:#0d2610;--g2:#163d1b;--g3:#1f5426;--g4:#276b30;--g5:#3da648;
+  --g6:#6dc475;--g7:#a8ddb0;--g8:#d6efda;--g9:#f0f9f1;
+  --gold:#f0ab1a;--gold2:#c39e52;--gold3:#fef3d0;--gold4:#8c6820;
+  --blue:#185fa5;--blue2:#eaf3fb;
+  --red:#a32d2d;--red2:#fef0f0;
+  --purple:#534ab7;--purple2:#f0edfb;
+  --teal:#0f6e56;--teal2:#e7f6f9;
+  --orange:#9a4a0a;--orange2:#fef3e7;
+  --r:12px;--dur:180ms;--ease:cubic-bezier(.4,0,.2,1);
+  --shadow:0 2px 16px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:#f4f7f4;color:var(--g1);min-height:100vh}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit}
+
+/* ── HEADER ── */
+header{background:var(--g1);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.hdr-inner{max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:10px 16px}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-icon{width:38px;height:38px;background:var(--gold);border-radius:8px;display:grid;place-items:center;font-size:18px;color:var(--g1)}
+.logo-text{font-size:20px;font-weight:900;letter-spacing:-.5px}
+.logo-sub{font-size:10px;color:var(--g7);display:block;font-weight:400}
+.hdr-actions{display:flex;align-items:center;gap:8px}
+.hdr-btn{background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;padding:7px 12px;font-size:13px;display:flex;align-items:center;gap:6px;transition:background var(--dur)}
+.hdr-btn:hover{background:rgba(255,255,255,.22)}
+.hdr-btn.gold{background:var(--gold);color:var(--g1);font-weight:700}
+.hdr-btn.gold:hover{background:#e09e0d}
+
+/* ── SEARCH BAR ── */
+.search-wrap{background:var(--g2);padding:12px 16px}
+.search-inner{max-width:1100px;margin:auto;display:flex;gap:8px;flex-wrap:wrap}
+.search-box{flex:1;min-width:200px;position:relative}
+.search-box input{width:100%;padding:10px 16px 10px 40px;border-radius:var(--r);border:none;background:#fff;font-size:14px;color:var(--g1)}
+.search-box i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--g5);font-size:14px}
+.search-sel{padding:10px 12px;border-radius:var(--r);border:none;background:#fff;font-size:13px;color:var(--g1);min-width:130px}
+.search-btn{background:var(--gold);color:var(--g1);border:none;border-radius:var(--r);padding:10px 18px;font-weight:700;font-size:14px;white-space:nowrap}
+
+/* ── CATEGORIES ── */
+.cats-wrap{background:#fff;border-bottom:1px solid var(--g8);overflow-x:auto;scrollbar-width:none}
+.cats-wrap::-webkit-scrollbar{display:none}
+.cats-inner{max-width:1100px;margin:auto;display:flex;gap:4px;padding:8px 12px}
+.cat-pill{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 14px;border-radius:var(--r);border:2px solid transparent;cursor:pointer;transition:all var(--dur);background:transparent}
+.cat-pill:hover{background:var(--g9)}
+.cat-pill.active{border-color:currentColor;background:var(--g9)}
+.cat-pill i{font-size:20px}
+.cat-pill span{font-size:11px;font-weight:600;white-space:nowrap}
+
+/* ── MAIN GRID ── */
+.main{max-width:1100px;margin:auto;padding:16px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-size:16px;font-weight:700;color:var(--g2)}
+.section-count{font-size:12px;color:var(--g5);background:var(--g9);padding:3px 10px;border-radius:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+
+/* ── LISTING CARD ── */
+.card{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);transition:transform var(--dur),box-shadow var(--dur)}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.14)}
+.card-img{height:130px;position:relative;display:flex;align-items:flex-end;padding:10px}
+.card-img .badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.badge.avail{background:rgba(255,255,255,.9)}
+.badge.avail.green{color:#166534}
+.badge.avail.yellow{color:#854d0e}
+.badge.avail.red{color:#991b1b}
+.badge.insurance{background:#dc2626;color:#fff}
+.badge.verified{background:var(--gold);color:var(--g1)}
+.badge.organic{background:#0f6e56;color:#fff}
+.badge.route{background:rgba(0,0,0,.55);color:#fff}
+.card-body{padding:12px}
+.card-name{font-size:14px;font-weight:700;color:var(--g1);margin-bottom:4px;line-height:1.3}
+.card-owner{font-size:12px;color:#666;margin-bottom:8px;display:flex;align-items:center;gap:4px}
+.card-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.meta-chip{background:var(--g9);color:var(--g3);border-radius:6px;padding:3px 8px;font-size:11px;display:flex;align-items:center;gap:4px}
+.card-route{background:var(--blue2);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--blue);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.card-foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--g8);padding-top:8px;margin-top:4px}
+.card-price{font-size:17px;font-weight:900;color:var(--g3)}
+.card-price span{font-size:11px;font-weight:400;color:#888}
+.card-rating{display:flex;align-items:center;gap:4px;font-size:12px;color:#888}
+.card-rating i{color:var(--gold)}
+.card-actions{display:flex;gap:6px;margin-top:8px}
+.btn{border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;transition:all var(--dur)}
+.btn-primary{background:var(--g4);color:#fff;flex:1;justify-content:center}
+.btn-primary:hover{background:var(--g3)}
+.btn-outline{background:transparent;color:var(--g4);border:1.5px solid var(--g4)}
+.btn-outline:hover{background:var(--g9)}
+.btn-wa{background:#25d366;color:#fff}
+.btn-wa:hover{background:#1fad55}
+.btn-gold{background:var(--gold);color:var(--g1)}
+.btn-gold:hover{background:#e09e0d}
+.btn-red{background:#dc2626;color:#fff}
+
+/* ── ORGANIC CARD extras ── */
+.organic-type{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-right:4px}
+.organic-sell{background:#dcfce7;color:#166534}
+.organic-buy{background:#dbeafe;color:#1d4ed8}
+.quality-stars{display:flex;gap:2px}
+.quality-stars i{font-size:12px;color:var(--gold)}
+
+/* ── STORAGE CARD extras ── */
+.temp-badge{background:#dbeafe;color:#1e40af;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px}
+
+/* ── MODALS ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative}
+.modal.wide{max-width:640px}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--g8);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:2}
+.modal-title{font-size:16px;font-weight:700;color:var(--g1)}
+.modal-close{background:none;border:none;font-size:20px;color:#888;padding:4px;line-height:1}
+.modal-body{padding:20px}
+
+/* ── AUTH MODAL ── */
+.auth-tabs{display:flex;border-bottom:2px solid var(--g8);margin-bottom:20px}
+.auth-tab{flex:1;padding:10px;text-align:center;font-weight:600;font-size:14px;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all var(--dur)}
+.auth-tab.active{color:var(--g4);border-color:var(--g4)}
+.form-group{margin-bottom:14px}
+.form-label{font-size:13px;font-weight:600;color:var(--g2);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:10px 14px;border:1.5px solid #ddd;border-radius:var(--r);font-size:14px;transition:border var(--dur)}
+.form-input:focus{outline:none;border-color:var(--g5)}
+.form-select{width:100%;padding:10px 14px;border:1.5px solid #ddd;border-radius:var(--r);font-size:14px;background:#fff}
+.form-hint{font-size:11px;color:#888;margin-top:4px}
+.otp-wrap{display:flex;gap:8px;margin-top:8px}
+.otp-input{flex:1;padding:12px;text-align:center;font-size:20px;font-weight:700;border:1.5px solid #ddd;border-radius:var(--r);letter-spacing:4px}
+.auth-or{text-align:center;color:#aaa;font-size:12px;margin:12px 0;position:relative}
+.auth-or::before,.auth-or::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:#eee}
+.auth-or::before{right:0}
+.auth-or::after{left:0}
+
+/* ── PROFILE MODAL ── */
+.profile-header{background:linear-gradient(135deg,var(--g2),var(--g4));padding:24px;text-align:center;color:#fff}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--gold);display:grid;place-items:center;font-size:28px;color:var(--g1);margin:0 auto 12px}
+.profile-name{font-size:18px;font-weight:700}
+.profile-phone{font-size:13px;color:var(--g7);margin-top:4px}
+.profile-stats{display:flex;gap:1px;background:var(--g8);border-radius:12px;overflow:hidden;margin-top:16px}
+.pstat{flex:1;background:#fff;padding:10px;text-align:center}
+.pstat-val{font-size:18px;font-weight:900;color:var(--g3)}
+.pstat-lbl{font-size:10px;color:#888}
+.profile-tabs{display:flex;border-bottom:2px solid var(--g8);padding:0 16px}
+.ptab{padding:12px 16px;font-size:13px;font-weight:600;color:#888;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px}
+.ptab.active{color:var(--g4);border-color:var(--g4)}
+.ptab-content{display:none;padding:16px}
+.ptab-content.active{display:block}
+
+/* ── AI MODAL ── */
+.ai-upload{border:2px dashed var(--g7);border-radius:var(--r);padding:32px;text-align:center;cursor:pointer;transition:border var(--dur)}
+.ai-upload:hover{border-color:var(--g5);background:var(--g9)}
+.ai-upload i{font-size:40px;color:var(--g6);margin-bottom:8px}
+.ai-result{background:var(--g9);border-radius:var(--r);padding:16px;margin-top:16px}
+.ai-result-title{font-size:15px;font-weight:700;color:var(--g2);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.confidence{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.conf-bar{flex:1;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden}
+.conf-fill{height:100%;background:var(--g5);border-radius:4px;transition:width .6s}
+
+/* ── FLOATING ADD BTN ── */
+.fab{position:fixed;bottom:24px;left:24px;width:56px;height:56px;border-radius:50%;background:var(--gold);color:var(--g1);border:none;font-size:24px;box-shadow:0 4px 16px rgba(240,171,26,.5);z-index:150;transition:transform var(--dur)}
+.fab:hover{transform:scale(1.1)}
+
+/* ── BOTTOM NAV (mobile) ── */
+.bottom-nav{display:none;position:fixed;bottom:0;inset-inline:0;background:#fff;border-top:1px solid var(--g8);z-index:150;padding:6px 0 env(safe-area-inset-bottom)}
+.bnav-inner{display:flex;justify-content:space-around}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;cursor:pointer;color:#888;font-size:10px;font-weight:600;transition:color var(--dur)}
+.bnav-item.active,.bnav-item:hover{color:var(--g4)}
+.bnav-item i{font-size:20px}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:48px 20px;color:#aaa}
+.empty i{font-size:48px;margin-bottom:12px;display:block}
+.empty p{font-size:14px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--g1);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:500;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── DETAIL MODAL EXTRAS ── */
+.detail-img{height:200px;border-radius:12px;margin-bottom:16px;display:flex;align-items:flex-end;padding:12px}
+.detail-specs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.spec-item{background:var(--g9);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:2px}
+.spec-label{font-size:10px;color:#888;font-weight:600}
+.spec-value{font-size:13px;font-weight:700;color:var(--g2)}
+.review-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--g8)}
+.review-avatar{width:36px;height:36px;border-radius:50%;background:var(--g8);display:grid;place-items:center;font-size:14px;flex-shrink:0}
+.review-name{font-size:13px;font-weight:700}
+.review-text{font-size:12px;color:#666;margin-top:3px}
+
+/* ── NOTIFICATION BELL ── */
+.notif-bell{position:relative}
+.notif-badge{position:absolute;top:-4px;right:-4px;background:#dc2626;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--g1)}
+.notif-item{display:flex;gap:10px;padding:12px;border-bottom:1px solid var(--g8);cursor:pointer;transition:background var(--dur)}
+.notif-item:hover{background:var(--g9)}
+.notif-item.unread{background:#f0f9f1}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--g5);flex-shrink:0;margin-top:5px}
+.notif-text{font-size:13px;color:var(--g1);line-height:1.4}
+.notif-time{font-size:11px;color:#aaa;margin-top:3px}
+
+/* ── SORT BAR ── */
+.sort-bar{max-width:1100px;margin:auto;padding:10px 16px 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sort-label{font-size:12px;color:#888;font-weight:600}
+.sort-btn{padding:5px 12px;border-radius:20px;border:1.5px solid var(--g8);background:#fff;font-size:12px;font-weight:600;color:#666;cursor:pointer;transition:all var(--dur)}
+.sort-btn.active{background:var(--g4);color:#fff;border-color:var(--g4)}
+.price-range{display:flex;align-items:center;gap:6px;margin-right:auto}
+.price-range input{width:90px;padding:5px 8px;border:1.5px solid var(--g8);border-radius:20px;font-size:12px;text-align:center}
+
+/* ── FAVORITES ── */
+.btn-fav{background:transparent;border:1.5px solid #ddd;color:#ccc;border-radius:8px;padding:8px 10px;transition:all var(--dur)}
+.btn-fav.active{color:#ef4444;border-color:#ef4444;background:#fff5f5}
+
+/* ── WEATHER WIDGET ── */
+.weather-bar{background:linear-gradient(135deg,var(--g2),#1a5266);color:#fff;padding:10px 16px}
+.weather-inner{max-width:1100px;margin:auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.weather-item{display:flex;align-items:center;gap:8px;font-size:13px}
+.weather-item i{font-size:18px;color:var(--gold)}
+.weather-sep{color:rgba(255,255,255,.3);font-size:18px}
+.weather-tip{background:rgba(255,255,255,.12);border-radius:8px;padding:6px 12px;font-size:12px;flex:1;min-width:200px}
+
+/* ── CHAT MODAL ── */
+.chat-messages{height:300px;overflow-y:auto;padding:12px;background:var(--g9);border-radius:var(--r);margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:80%;padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.4}
+.msg.sent{background:var(--g4);color:#fff;align-self:flex-start;border-radius:12px 12px 4px 12px}
+.msg.recv{background:#fff;color:var(--g1);align-self:flex-end;border-radius:12px 12px 12px 4px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.msg-time{font-size:10px;opacity:.6;margin-top:3px}
+.chat-input-wrap{display:flex;gap:8px}
+.chat-input-wrap input{flex:1;padding:10px 14px;border:1.5px solid var(--g8);border-radius:var(--r);font-size:14px}
+
+/* ── INTEGRATED REQUEST ── */
+.integrated-banner{background:linear-gradient(135deg,var(--gold4),var(--gold));border-radius:var(--r);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform var(--dur)}
+.integrated-banner:hover{transform:scale(1.01)}
+.integrated-banner i{font-size:28px;color:var(--g1)}
+.integrated-banner .ib-text{flex:1}
+.integrated-banner .ib-title{font-size:14px;font-weight:700;color:var(--g1)}
+.integrated-banner .ib-sub{font-size:12px;color:var(--g2);margin-top:2px}
+
+/* ── EARNINGS CARD ── */
+.earnings-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.earn-card{background:var(--g9);border-radius:10px;padding:12px;text-align:center}
+.earn-val{font-size:20px;font-weight:900;color:var(--g3)}
+.earn-lbl{font-size:11px;color:#888;margin-top:2px}
+.earn-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g8);font-size:13px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr}
+  .bottom-nav{display:block}
+  .fab{bottom:80px}
+  .hdr-btn span{display:none}
+  .search-inner{flex-direction:column}
+  .search-sel{min-width:unset}
+}
+@media(max-width:400px){
+  .cats-inner{gap:2px}
+  .cat-pill{padding:6px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr-inner">
+    <div class="logo">
+      <div class="logo-icon"><i class="fa-solid fa-wheat-awn"></i></div>
+      <div>
+        <div class="logo-text">هيباغري</div>
+        <span class="logo-sub">المنصة الفلاحية الجزائرية</span>
+      </div>
+    </div>
+    <div class="hdr-actions">
+      <button class="hdr-btn" onclick="openAI()"><i class="fa-solid fa-microchip"></i><span>AI</span></button>
+      <button class="hdr-btn" onclick="openAdd()"><i class="fa-solid fa-plus"></i><span>أضف</span></button>
+      <button class="hdr-btn notif-bell" onclick="openNotifications()" title="الإشعارات">
+        <i class="fa-solid fa-bell"></i>
+        <span class="notif-badge" id="notifBadge">3</span>
+      </button>
+      <button class="hdr-btn gold" id="authBtn" onclick="openAuth()"><i class="fa-solid fa-user"></i><span>دخول</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- WEATHER BAR -->
+<div class="weather-bar" id="weatherBar">
+  <div class="weather-inner">
+    <div class="weather-item"><i class="fa-solid fa-sun"></i><span id="wTemp">28°C — مشمس</span></div>
+    <div class="weather-sep">|</div>
+    <div class="weather-item"><i class="fa-solid fa-wind"></i><span id="wWind">ريح 15 كم/س</span></div>
+    <div class="weather-sep">|</div>
+    <div class="weather-item"><i class="fa-solid fa-droplet"></i><span id="wHumid">رطوبة 42%</span></div>
+    <div class="weather-tip"><i class="fa-solid fa-seedling"></i> <span id="wTip">مناسب للحرث والبذر اليوم</span></div>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <div class="search-inner">
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="searchInput" type="text" placeholder="ابحث عن معدة، خدمة..." oninput="applyFilters()"/>
+    </div>
+    <select class="search-sel" id="wilayaFilter" onchange="applyFilters()">
+      <option value="">كل الولايات</option>
+      <option>أدرار</option><option>الشلف</option><option>الأغواط</option><option>أم البواقي</option>
+      <option>باتنة</option><option>بجاية</option><option>بسكرة</option><option>بشار</option>
+      <option>البليدة</option><option>البويرة</option><option>تمنراست</option><option>تبسة</option>
+      <option>تلمسان</option><option>تيارت</option><option>تيزي وزو</option><option>الجزائر</option>
+      <option>الجلفة</option><option>جيجل</option><option>سطيف</option><option>سعيدة</option>
+      <option>سكيكدة</option><option>سيدي بلعباس</option><option>عنابة</option><option>قالمة</option>
+      <option>قسنطينة</option><option>المدية</option><option>مستغانم</option><option>المسيلة</option>
+      <option>معسكر</option><option>ورقلة</option><option>وهران</option><option>البيض</option>
+      <option>إليزي</option><option>برج بوعريريج</option><option>بومرداس</option><option>الطارف</option>
+      <option>تندوف</option><option>تيسمسيلت</option><option>الوادي</option><option>خنشلة</option>
+      <option>سوق أهراس</option><option>تيبازة</option><option>ميلة</option><option>عين الدفلى</option>
+      <option>النعامة</option><option>عين تيموشنت</option><option>غرداية</option><option>غليزان</option>
+      <option>تيميمون</option><option>برج باجي مختار</option><option>أولاد جلال</option><option>بني عباس</option>
+      <option>عين صالح</option><option>عين قزام</option><option>تقرت</option><option>جانت</option><option>المغير</option><option>المنيعة</option>
+    </select>
+    <select class="search-sel" id="availFilter" onchange="applyFilters()">
+      <option value="">كل الحالات</option>
+      <option value="green">متاح</option>
+      <option value="yellow">مشغول جزئياً</option>
+      <option value="red">غير متاح</option>
+    </select>
+    <button class="search-btn" onclick="applyFilters()"><i class="fa-solid fa-filter"></i> تصفية</button>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="cats-wrap">
+  <div class="cats-inner" id="catsInner"></div>
+</div>
+
+<!-- SORT BAR -->
+<div style="background:#fff;border-bottom:1px solid var(--g8)">
+  <div class="sort-bar">
+    <span class="sort-label">ترتيب:</span>
+    <button class="sort-btn active" onclick="setSort('default',this)">الافتراضي</button>
+    <button class="sort-btn" onclick="setSort('price_asc',this)">السعر ↑</button>
+    <button class="sort-btn" onclick="setSort('price_desc',this)">السعر ↓</button>
+    <button class="sort-btn" onclick="setSort('rating',this)">الأعلى تقييماً</button>
+    <div class="price-range">
+      <input type="number" id="priceMin" placeholder="من دج" oninput="applyFilters()"/>
+      <span style="font-size:12px;color:#aaa">—</span>
+      <input type="number" id="priceMax" placeholder="إلى دج" oninput="applyFilters()"/>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+  <div class="section-head">
+    <div class="section-title" id="sectionTitle">جميع الخدمات</div>
+    <div class="section-count" id="sectionCount">0 نتيجة</div>
+  </div>
+  <!-- INTEGRATED REQUEST BANNER (shown only on home) -->
+  <div class="integrated-banner" id="integratedBanner" onclick="openIntegrated()">
+    <i class="fa-solid fa-arrows-split-up-and-left"></i>
+    <div class="ib-text">
+      <div class="ib-title">طلب متكامل — معدة + نقل بضربة واحدة</div>
+      <div class="ib-sub">احجز جراراً وشاحنة في طلب واحد — وفّر الوقت والتنسيق</div>
+    </div>
+    <i class="fa-solid fa-chevron-left"></i>
+  </div>
+
+  <div class="grid" id="listingsGrid"></div>
+  <div class="empty" id="emptyState" style="display:none">
+    <i class="fa-solid fa-box-open"></i>
+    <p>لا توجد نتائج مطابقة</p>
+  </div>
+</main>
+
+<!-- FAB -->
+<button class="fab" onclick="openAdd()" title="أضف إعلاناً"><i class="fa-solid fa-plus"></i></button>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bnav-inner">
+    <div class="bnav-item active" onclick="selectCat(null)"><i class="fa-solid fa-house"></i>الرئيسية</div>
+    <div class="bnav-item" onclick="selectCat('transport')"><i class="fa-solid fa-truck"></i>نقل</div>
+    <div class="bnav-item" onclick="openAI()"><i class="fa-solid fa-microchip"></i>AI</div>
+    <div class="bnav-item" onclick="openFavorites()"><i class="fa-regular fa-heart"></i>محفوظات</div>
+    <div class="bnav-item" onclick="openProfile()"><i class="fa-solid fa-user"></i>حسابي</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════
+     MODALS
+═══════════════════════════════════════ -->
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="authOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-user-shield"></i> الدخول / التسجيل</div>
+      <button class="modal-close" onclick="closeModal('authOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchAuthTab('login')">دخول</div>
+        <div class="auth-tab" onclick="switchAuthTab('register')">تسجيل جديد</div>
+      </div>
+      <!-- Login -->
+      <div id="loginForm">
+        <div class="form-group">
+          <label class="form-label">رقم الهاتف</label>
+          <input class="form-input" id="loginPhone" type="tel" placeholder="05XXXXXXXX" maxlength="10"/>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="sendOTP('login')">
+          <i class="fa-solid fa-paper-plane"></i> إرسال رمز التحقق
+        </button>
+        <div id="loginOTPWrap" style="display:none;margin-top:14px">
+          <label class="form-label">رمز التحقق (OTP)</label>
+          <div class="otp-wrap">
+            <input class="otp-input" id="loginOTP" type="tel" maxlength="6" placeholder="------"/>
+          </div>
+          <div class="form-hint">أُرسل رمز افتراضي: <strong>123456</strong></div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px" onclick="verifyOTP('login')">
+            <i class="fa-solid fa-check"></i> تأكيد الدخول
+          </button>
+        </div>
+      </div>
+      <!-- Register -->
+      <div id="registerForm" style="display:none">
+        <div class="form-group">
+          <label class="form-label">الاسم الكامل</label>
+          <input class="form-input" id="regName" type="text" placeholder="محمد بن علي"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">رقم الهاتف</label>
+          <input class="form-input" id="regPhone" type="tel" placeholder="05XXXXXXXX" maxlength="10"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الولاية</label>
+          <select class="form-select" id="regWilaya">
+            <option value="">اختر ولايتك</option>
+            <option>تيارت</option><option>وهران</option><option>الجزائر</option><option>سطيف</option>
+            <option>قسنطينة</option><option>باتنة</option><option>بسكرة</option><option>تلمسان</option>
+            <option>البليدة</option><option>بجاية</option><option>معسكر</option><option>مستغانم</option>
+            <option>سيدي بلعباس</option><option>تيزي وزو</option><option>المدية</option><option>البويرة</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">نوع الحساب</label>
+          <select class="form-select" id="regType">
+            <option value="farmer">فلاح / مزارع</option>
+            <option value="owner">مالك معدات</option>
+            <option value="transporter">ناقل / شاحنجي</option>
+            <option value="company">شركة / مؤسسة</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="sendOTP('register')">
+          <i class="fa-solid fa-paper-plane"></i> إرسال رمز التحقق
+        </button>
+        <div id="regOTPWrap" style="display:none;margin-top:14px">
+          <label class="form-label">رمز التحقق (OTP)</label>
+          <div class="otp-wrap">
+            <input class="otp-input" id="regOTP" type="tel" maxlength="6" placeholder="------"/>
+          </div>
+          <div class="form-hint">أُرسل رمز افتراضي: <strong>123456</strong></div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px" onclick="verifyOTP('register')">
+            <i class="fa-solid fa-user-plus"></i> إنشاء الحساب
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="overlay" id="profileOverlay">
+  <div class="modal wide">
+    <div class="modal-close" style="position:absolute;top:12px;left:12px;z-index:3">
+      <button class="modal-close" onclick="closeModal('profileOverlay')" style="background:rgba(255,255,255,.2);color:#fff;border-radius:50%;width:32px;height:32px;display:grid;place-items:center">✕</button>
+    </div>
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">ع</div>
+      <div class="profile-name" id="profileName">المستخدم</div>
+      <div class="profile-phone" id="profilePhone">05XX XXX XXX</div>
+      <div class="profile-stats">
+        <div class="pstat"><div class="pstat-val" id="pstatListings">0</div><div class="pstat-lbl">إعلاناتي</div></div>
+        <div class="pstat"><div class="pstat-val" id="pstatBookings">0</div><div class="pstat-lbl">حجوزاتي</div></div>
+        <div class="pstat"><div class="pstat-val" id="pstatRating">—</div><div class="pstat-lbl">تقييمي</div></div>
+      </div>
+    </div>
+    <div class="profile-tabs">
+      <div class="ptab active" onclick="switchProfileTab('mylistings')">إعلاناتي</div>
+      <div class="ptab" onclick="switchProfileTab('mybookings')">حجوزاتي</div>
+      <div class="ptab" onclick="switchProfileTab('earnings')">الأرباح</div>
+      <div class="ptab" onclick="switchProfileTab('settings')">الإعدادات</div>
+    </div>
+    <div class="ptab-content active" id="tab-mylistings">
+      <div id="myListingsContainer"><div class="empty"><i class="fa-solid fa-box-open"></i><p>لم تضف أي إعلان بعد</p></div></div>
+    </div>
+    <div class="ptab-content" id="tab-mybookings">
+      <div class="empty"><i class="fa-solid fa-calendar"></i><p>لا توجد حجوزات بعد</p></div>
+    </div>
+    <div class="ptab-content" id="tab-earnings">
+      <div class="earnings-summary">
+        <div class="earn-card"><div class="earn-val">248,000</div><div class="earn-lbl">دج إجمالي الأرباح</div></div>
+        <div class="earn-card"><div class="earn-val">17</div><div class="earn-lbl">حجز مكتمل</div></div>
+        <div class="earn-card"><div class="earn-val">14,600</div><div class="earn-lbl">دج متوسط الحجز</div></div>
+        <div class="earn-card"><div class="earn-val">4.8</div><div class="earn-lbl">متوسط التقييم</div></div>
+      </div>
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px">آخر المعاملات</div>
+      <div class="earn-row"><span>حجز جرار — 3 أيام</span><span style="color:var(--g4);font-weight:700">+36,000 دج</span></div>
+      <div class="earn-row"><span>حجز حاصدة — يوم واحد</span><span style="color:var(--g4);font-weight:700">+28,000 دج</span></div>
+      <div class="earn-row"><span>رحلة نقل وهران→الجزائر</span><span style="color:var(--g4);font-weight:700">+35,000 دج</span></div>
+      <div class="earn-row"><span>حجز مولد — يومان</span><span style="color:var(--g4);font-weight:700">+70,000 دج</span></div>
+      <div style="margin-top:12px;padding:10px;background:var(--g9);border-radius:8px;font-size:12px;color:#666;text-align:center">
+        <i class="fa-solid fa-info-circle" style="color:var(--g5)"></i> يتم التحويل خلال 3 أيام عمل بعد اكتمال الحجز
+      </div>
+    </div>
+    <div class="ptab-content" id="tab-settings">
+      <div class="form-group">
+        <label class="form-label">الاسم الكامل</label>
+        <input class="form-input" id="settingsName" type="text"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">الولاية</label>
+        <input class="form-input" id="settingsWilaya" type="text"/>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveSettings()">
+        <i class="fa-solid fa-floppy-disk"></i> حفظ التغييرات
+      </button>
+      <button class="btn btn-red" style="width:100%;justify-content:center;margin-top:10px" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="detailOverlay">
+  <div class="modal wide">
+    <div class="modal-head">
+      <div class="modal-title" id="detailTitle">تفاصيل</div>
+      <button class="modal-close" onclick="closeModal('detailOverlay')">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="overlay" id="bookingOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-calendar-check"></i> طلب حجز</div>
+      <button class="modal-close" onclick="closeModal('bookingOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">تاريخ البداية</label>
+        <input class="form-input" type="date" id="bookFrom"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">تاريخ النهاية</label>
+        <input class="form-input" type="date" id="bookTo"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ملاحظات إضافية</label>
+        <textarea class="form-input" rows="3" id="bookNote" placeholder="أي تفاصيل إضافية..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">رقم هاتفك</label>
+        <input class="form-input" type="tel" id="bookPhone" placeholder="05XXXXXXXX"/>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="confirmBooking()">
+        <i class="fa-solid fa-check"></i> تأكيد الطلب
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LISTING MODAL -->
+<div class="overlay" id="addOverlay">
+  <div class="modal wide">
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-plus-circle"></i> إضافة إعلان</div>
+      <button class="modal-close" onclick="closeModal('addOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">نوع الخدمة</label>
+        <select class="form-select" id="addCat" onchange="updateAddForm()">
+          <option value="agri">معدات فلاحية</option>
+          <option value="transport">نقل البضائع</option>
+          <option value="const">آلات الأشغال</option>
+          <option value="organic">سوق النفايات العضوية</option>
+          <option value="storage">مستودعات تبريد</option>
+          <option value="inputs">مستلزمات فلاحية</option>
+          <option value="gen">مولدات كهربائية</option>
+          <option value="pump">مضخات</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">العنوان / الاسم</label>
+        <input class="form-input" id="addName" type="text" placeholder="مثال: جرار John Deere 5090E"/>
+      </div>
+      <div id="addExtraFields"></div>
+      <div class="form-group">
+        <label class="form-label">الولاية</label>
+        <select class="form-select" id="addWilaya">
+          <option>تيارت</option><option>وهران</option><option>الجزائر</option><option>سطيف</option>
+          <option>قسنطينة</option><option>باتنة</option><option>بسكرة</option><option>تلمسان</option>
+          <option>البليدة</option><option>بجاية</option><option>معسكر</option><option>مستغانم</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">السعر (دج)</label>
+        <input class="form-input" id="addPrice" type="number" placeholder="0"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">وحدة السعر</label>
+        <select class="form-select" id="addUnit">
+          <option>يوم</option><option>ساعة</option><option>رحلة</option><option>طن</option><option>شهر</option><option>قطعة</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">رقم هاتف التواصل</label>
+        <input class="form-input" id="addPhone" type="tel" placeholder="05XXXXXXXX"/>
+      </div>
+      <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:8px" onclick="submitListing()">
+        <i class="fa-solid fa-upload"></i> نشر الإعلان
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- AI MODAL -->
+<div class="overlay" id="aiOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-microchip"></i> تشخيص الأمراض بالذكاء الاصطناعي</div>
+      <button class="modal-close" onclick="closeModal('aiOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:#666;margin-bottom:14px">ارفع صورة للنبات أو المحصول المريض وسيقوم الذكاء الاصطناعي بتشخيصه فوراً</p>
+      <div class="ai-upload" onclick="document.getElementById('aiFileInput').click()">
+        <i class="fa-solid fa-camera"></i>
+        <p style="font-size:13px;color:#666;margin-top:8px">اضغط لاختيار صورة</p>
+        <p style="font-size:11px;color:#aaa;margin-top:4px">JPG, PNG — حتى 10MB</p>
+      </div>
+      <input type="file" id="aiFileInput" accept="image/*" style="display:none" onchange="analyzeImage(this)"/>
+      <div style="margin-top:14px">
+        <label class="form-label">أو وصّف الأعراض</label>
+        <textarea class="form-input" id="aiText" rows="3" placeholder="مثال: أوراق صفراء مع بقع بنية على الحواف..."></textarea>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px" onclick="analyzeText()">
+          <i class="fa-solid fa-brain"></i> تشخيص بالذكاء الاصطناعي
+        </button>
+      </div>
+      <div id="aiResult" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS MODAL -->
+<div class="overlay" id="notifOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-bell"></i> الإشعارات</div>
+      <button class="modal-close" onclick="closeModal('notifOverlay');clearNotifBadge()">✕</button>
+    </div>
+    <div id="notifList">
+      <div class="notif-item unread">
+        <div class="notif-dot"></div>
+        <div><div class="notif-text">تم تأكيد حجزك لـ <strong>جرار John Deere 5090E</strong> بتيارت</div><div class="notif-time">منذ 10 دقائق</div></div>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-dot"></div>
+        <div><div class="notif-text">عرض جديد في سوق العضوي: <strong>سباخ بقري — درجة A</strong> بتيارت</div><div class="notif-time">منذ ساعة</div></div>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-dot"></div>
+        <div><div class="notif-text">خفّضت أسعار نقل البضائع من وهران اليوم — اطلع على العروض</div><div class="notif-time">منذ 3 ساعات</div></div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-dot" style="background:#ccc"></div>
+        <div><div class="notif-text">رسالة جديدة من <strong>بولحاجي حداد</strong> بخصوص الجرار</div><div class="notif-time">أمس</div></div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-dot" style="background:#ccc"></div>
+        <div><div class="notif-text">تم إضافة 5 إعلانات جديدة في <strong>معسكر</strong></div><div class="notif-time">يومان</div></div>
+      </div>
+    </div>
+    <div style="padding:12px;text-align:center">
+      <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="clearNotifBadge();showToast('تم تحديد الكل كمقروء')">
+        <i class="fa-solid fa-check-double"></i> تحديد الكل كمقروء
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT MODAL -->
+<div class="overlay" id="chatOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="chatTitle"><i class="fa-solid fa-comment-dots"></i> المحادثة</div>
+      <button class="modal-close" onclick="closeModal('chatOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg recv"><div>السلام عليكم، كيف يمكنني مساعدتك؟</div><div class="msg-time">10:30</div></div>
+        <div class="msg sent"><div>وعليكم السلام، هل الجرار متاح هذا الأسبوع؟</div><div class="msg-time">10:31</div></div>
+        <div class="msg recv"><div>نعم متاح من الثلاثاء حتى الجمعة</div><div class="msg-time">10:33</div></div>
+      </div>
+      <div class="chat-input-wrap">
+        <input id="chatInput" type="text" placeholder="اكتب رسالتك..." onkeydown="if(event.key==='Enter')sendChatMsg()"/>
+        <button class="btn btn-primary" onclick="sendChatMsg()"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INTEGRATED REQUEST MODAL -->
+<div class="overlay" id="integratedOverlay">
+  <div class="modal wide">
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-arrows-split-up-and-left"></i> طلب متكامل</div>
+      <button class="modal-close" onclick="closeModal('integratedOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--gold3);border-radius:10px;padding:12px;font-size:13px;color:var(--gold4);margin-bottom:16px">
+        <i class="fa-solid fa-lightbulb"></i> <strong>فكرة:</strong> احجز معدة فلاحية وشاحنة نقل في نفس الوقت — نضرب عصفورين بحجر واحد!
+      </div>
+      <div class="form-group">
+        <label class="form-label">نوع المعدة الفلاحية</label>
+        <select class="form-select" id="intAgri">
+          <option>جرار John Deere 5090E — تيارت</option>
+          <option>جرار New Holland T7.210 — معسكر</option>
+          <option>حاصدة Claas Lexion 760 — تيارت</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">خدمة النقل</label>
+        <select class="form-select" id="intTransport">
+          <option>شاحنة Mercedes Actros — وهران → الجزائر</option>
+          <option>شاحنة DAF XF — تيارت → وهران</option>
+          <option>شاحنة Renault مبردة — قسنطينة → سطيف</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">تاريخ البداية</label>
+        <input class="form-input" type="date" id="intDate"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">رقم هاتفك</label>
+        <input class="form-input" type="tel" id="intPhone" placeholder="05XXXXXXXX"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ملاحظات</label>
+        <textarea class="form-input" rows="2" id="intNote" placeholder="أي تفاصيل إضافية..."></textarea>
+      </div>
+      <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:8px" onclick="submitIntegrated()">
+        <i class="fa-solid fa-rocket"></i> إرسال الطلب المتكامل
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- FAVORITES MODAL -->
+<div class="overlay" id="favOverlay">
+  <div class="modal wide">
+    <div class="modal-head">
+      <div class="modal-title"><i class="fa-solid fa-heart" style="color:#ef4444"></i> المحفوظات</div>
+      <button class="modal-close" onclick="closeModal('favOverlay')">✕</button>
+    </div>
+    <div class="modal-body" id="favBody">
+      <div class="empty"><i class="fa-regular fa-heart"></i><p>لا توجد إعلانات محفوظة بعد</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+const CATS = [
+  {id:null,      icon:'fa-th-large',      label:'الكل',          color:'#276b30', bg:'#edf7ee'},
+  {id:'transport',icon:'fa-truck',         label:'نقل البضائع',   color:'#185fa5', bg:'#eaf3fb'},
+  {id:'const',   icon:'fa-helmet-safety', label:'آلات الأشغال',  color:'#9a4a0a', bg:'#fef3e7'},
+  {id:'agri',    icon:'fa-tractor',       label:'معدات فلاحية',  color:'#276b30', bg:'#edf7ee'},
+  {id:'harvest', icon:'fa-wheat-awn',     label:'حاصدات',        color:'#b97d10', bg:'#fef9ec'},
+  {id:'organic', icon:'fa-recycle',       label:'سوق العضوي',    color:'#0f6e56', bg:'#e7f6f9'},
+  {id:'storage', icon:'fa-warehouse',     label:'مستودعات',      color:'#534ab7', bg:'#f0edfb'},
+  {id:'inputs',  icon:'fa-box-open',      label:'مستلزمات',      color:'#a32d2d', bg:'#fef0f0'},
+  {id:'gen',     icon:'fa-bolt',          label:'مولدات',        color:'#6b35b7', bg:'#f5edfb'},
+  {id:'pump',    icon:'fa-faucet-drip',   label:'مضخات',         color:'#0f6e56', bg:'#e7f6f9'},
+];
+
+const LISTINGS = [
+  // ── TRANSPORT ──
+  {id:'T1',cat:'transport',name:'شاحنة Mercedes Actros 1845',owner:'عمر بلحوت',phone:'0550123456',
+   wilaya:'وهران',from:'وهران',to:'الجزائر العاصمة',distance:'360 كم',
+   capacity:'30 طن',withDriver:true,price:35000,unit:'رحلة',
+   rating:4.9,reviews:64,avail:'green',
+   bg:'linear-gradient(135deg,#0d3066,#1a5aa5)',icon:'fa-truck'},
+  {id:'T2',cat:'transport',name:'شاحنة DAF XF 480 مقطورة',owner:'يوسف قدور',phone:'0660234567',
+   wilaya:'تيارت',from:'تيارت',to:'وهران',distance:'180 كم',
+   capacity:'25 طن',withDriver:true,price:18000,unit:'رحلة',
+   rating:4.7,reviews:38,avail:'green',
+   bg:'linear-gradient(135deg,#0a2d5e,#1a4a90)',icon:'fa-truck'},
+  {id:'T3',cat:'transport',name:'رافعة شوكية Linde H50',owner:'شركة لوجي نقل',phone:'0770345678',
+   wilaya:'الجزائر',capacity:'5 طن',withDriver:true,price:8000,unit:'يوم',
+   rating:4.6,reviews:22,avail:'yellow',
+   bg:'linear-gradient(135deg,#1a3a6e,#2660aa)',icon:'fa-forklift'},
+  {id:'T4',cat:'transport',name:'شاحنة Renault Trucks T520 مبردة',owner:'برودة نقل',phone:'0550456789',
+   wilaya:'قسنطينة',from:'قسنطينة',to:'سطيف',distance:'90 كم',
+   capacity:'18 طن',withDriver:true,isCold:true,price:22000,unit:'رحلة',
+   rating:4.8,reviews:45,avail:'green',
+   bg:'linear-gradient(135deg,#1c3d6e,#2860b0)',icon:'fa-truck'},
+
+  // ── CONSTRUCTION ──
+  {id:'C1',cat:'const',name:'رافعة برجية Liebherr 130 EC',owner:'شركة البناء الحديث',phone:'0660567890',
+   wilaya:'الجزائر',capacity:'8 طن',height:'60 م',
+   insuranceRequired:true,insuranceExpiry:'2026-08-15',withOperator:true,
+   price:180000,unit:'شهر',rating:4.7,reviews:18,avail:'green',
+   bg:'linear-gradient(135deg,#4a1e0a,#8a3a10)',icon:'fa-crane'},
+  {id:'C2',cat:'const',name:'حفارة Caterpillar 320',owner:'مؤسسة الأشغال الكبرى',phone:'0770678901',
+   wilaya:'وهران',capacity:'20 طن',depth:'8 م',
+   insuranceRequired:true,insuranceExpiry:'2026-05-30',withOperator:true,
+   price:45000,unit:'يوم',rating:4.8,reviews:29,avail:'green',
+   bg:'linear-gradient(135deg,#3d1505,#7a2e08)',icon:'fa-helmet-safety'},
+  {id:'C3',cat:'const',name:'بلدوزر Komatsu D65',owner:'بن شيخ للمعدات',phone:'0550789012',
+   wilaya:'سطيف',capacity:'15 طن',
+   insuranceRequired:true,insuranceExpiry:'2026-07-20',withOperator:false,
+   price:38000,unit:'يوم',rating:4.6,reviews:15,avail:'yellow',
+   bg:'linear-gradient(135deg,#3a1208,#6e2508)',icon:'fa-helmet-safety'},
+
+  // ── AGRICULTURAL ──
+  {id:'A1',cat:'agri',name:'جرار John Deere 5090E',owner:'بولحاجي حداد',phone:'0660890123',
+   wilaya:'تيارت',price:12000,unit:'يوم',year:2019,power:'90 حصان',
+   rating:4.9,reviews:34,avail:'green',
+   bg:'linear-gradient(135deg,#1a4d20,#2d8a38)',icon:'fa-tractor'},
+  {id:'A2',cat:'agri',name:'جرار New Holland T7.210',owner:'فرحاني عيسى',phone:'0770901234',
+   wilaya:'معسكر',price:14500,unit:'يوم',year:2021,power:'210 حصان',
+   rating:4.8,reviews:27,avail:'green',
+   bg:'linear-gradient(135deg,#1e5c25,#349a3d)',icon:'fa-tractor'},
+  {id:'A3',cat:'agri',name:'آلة تلبيس Kuhn HR3000',owner:'زروق حمزة',phone:'0550012345',
+   wilaya:'تيارت',price:8000,unit:'يوم',year:2020,
+   rating:4.7,reviews:19,avail:'green',
+   bg:'linear-gradient(135deg,#0d3d15,#196b25)',icon:'fa-tractor'},
+  {id:'A4',cat:'agri',name:'آلة بذر Amazone D9',owner:'حداد نور الدين',phone:'0660123450',
+   wilaya:'البليدة',price:9500,unit:'يوم',year:2022,
+   rating:4.9,reviews:41,avail:'yellow',
+   bg:'linear-gradient(135deg,#1a5220,#2e8a3a)',icon:'fa-tractor'},
+
+  // ── HARVEST ──
+  {id:'H1',cat:'harvest',name:'حاصدة Claas Lexion 760',owner:'شركة الحصاد الذهبي',phone:'0770234561',
+   wilaya:'تيارت',price:28000,unit:'يوم',year:2020,power:'520 حصان',
+   rating:4.9,reviews:56,avail:'green',
+   bg:'linear-gradient(135deg,#6b4d10,#b08020)',icon:'fa-wheat-awn'},
+  {id:'H2',cat:'harvest',name:'حاصدة New Holland CR9.90',owner:'بن علي فريد',phone:'0550345672',
+   wilaya:'سطيف',price:32000,unit:'يوم',year:2021,power:'635 حصان',
+   rating:4.8,reviews:33,avail:'yellow',
+   bg:'linear-gradient(135deg,#5a3e08,#9a6c15)',icon:'fa-wheat-awn'},
+
+  // ── ORGANIC MARKETPLACE ──
+  {id:'O1',cat:'organic',listingType:'sell',materialType:'سباخ بقري',
+   name:'سباخ بقري مُسَوَّى — درجة A',owner:'حسين بوعلام',phone:'0660456783',
+   wilaya:'تيارت',quantity:'200 طن',quality:5,certified:true,certification:'Bio Algeria',
+   price:4500,unit:'طن',rating:4.9,reviews:28,avail:'green',
+   bg:'linear-gradient(135deg,#0d4030,#1a6e50)',icon:'fa-recycle'},
+  {id:'O2',cat:'organic',listingType:'sell',materialType:'زرق دجاج',
+   name:'زرق دجاج مُجَفَّف — معالَج',owner:'مزرعة الدواجن الكبرى',phone:'0770567894',
+   wilaya:'معسكر',quantity:'500 طن',quality:4,certified:false,
+   price:2800,unit:'طن',rating:4.6,reviews:15,avail:'green',
+   bg:'linear-gradient(135deg,#0f4535,#1e7355)',icon:'fa-recycle'},
+  {id:'O3',cat:'organic',listingType:'buy',materialType:'مخلفات نباتية',
+   name:'طلب: مخلفات نباتية للتسميد',owner:'مصنع الأسمدة العضوية',phone:'0550678905',
+   wilaya:'الجزائر',quantity:'1000 طن',quality:3,certified:false,
+   price:1500,unit:'طن',rating:4.5,reviews:8,avail:'green',
+   bg:'linear-gradient(135deg,#103d28,#1c6640)',icon:'fa-recycle'},
+  {id:'O4',cat:'organic',listingType:'sell',materialType:'سماد عضوي مُركَّب',
+   name:'سماد عضوي مُركَّب شامل NPK',owner:'تعاونية فلاحية',phone:'0660789016',
+   wilaya:'بسكرة',quantity:'150 طن',quality:5,certified:true,certification:'ONAB',
+   price:6200,unit:'طن',rating:4.8,reviews:22,avail:'yellow',
+   bg:'linear-gradient(135deg,#0e3d26,#1a6640)',icon:'fa-recycle'},
+
+  // ── STORAGE ──
+  {id:'S1',cat:'storage',name:'مستودع تبريد — وهران الميناء',owner:'شركة الثلاجات الوطنية',phone:'0770890127',
+   wilaya:'وهران',storageType:'تبريد',tempRange:'-18°C → +4°C',area:'1200 م²',
+   capacity:'800 طن',humidity:'85%',hasDock:true,
+   price:25000,unit:'شهر',rating:4.8,reviews:42,avail:'green',
+   bg:'linear-gradient(135deg,#0d2a70,#1a4ab0)',icon:'fa-warehouse'},
+  {id:'S2',cat:'storage',name:'مستودع جاف — سطيف الصناعية',owner:'مؤسسة التخزين الحديث',phone:'0550901238',
+   wilaya:'سطيف',storageType:'جاف',area:'2000 م²',capacity:'1500 طن',hasDock:true,
+   price:18000,unit:'شهر',rating:4.6,reviews:25,avail:'green',
+   bg:'linear-gradient(135deg,#2a1a70,#4a35b0)',icon:'fa-warehouse'},
+  {id:'S3',cat:'storage',name:'غرفة تبريد متنقلة 40 قدم',owner:'ثلاجات السريع',phone:'0660012349',
+   wilaya:'تيارت',storageType:'متنقل',tempRange:'-5°C → +8°C',area:'30 م²',
+   capacity:'20 طن',price:8000,unit:'شهر',rating:4.7,reviews:16,avail:'green',
+   bg:'linear-gradient(135deg,#1a3066,#2a50a0)',icon:'fa-warehouse'},
+
+  // ── INPUTS ──
+  {id:'I1',cat:'inputs',name:'بذور قمح صلب معتمدة — Hassan',owner:'شركة GASA للبذور',phone:'0770123450',
+   wilaya:'الجزائر',quantity:'50 كغ/كيس',certification:'INPV',
+   price:3200,unit:'كيس',rating:4.9,reviews:87,avail:'green',
+   bg:'linear-gradient(135deg,#7a1a1a,#c03030)',icon:'fa-box-open'},
+  {id:'I2',cat:'inputs',name:'سماد يوريا 46% — مستورد',owner:'مؤسسة الحل الفلاحي',phone:'0550234561',
+   wilaya:'وهران',quantity:'50 كغ/كيس',
+   price:4800,unit:'كيس',rating:4.7,reviews:63,avail:'green',
+   bg:'linear-gradient(135deg,#6a1515,#aa2525)',icon:'fa-box-open'},
+  {id:'I3',cat:'inputs',name:'مبيد حشري Karate Zeon',owner:'بيت الفلاح',phone:'0660345672',
+   wilaya:'تيارت',quantity:'1 لتر',certification:'INPV',
+   price:1850,unit:'لتر',rating:4.6,reviews:44,avail:'yellow',
+   bg:'linear-gradient(135deg,#5c1010,#962020)',icon:'fa-box-open'},
+
+  // ── GENERATORS ──
+  {id:'G1',cat:'gen',name:'مولد Caterpillar 500 KVA',owner:'شركة الطاقة المستدامة',phone:'0770456783',
+   wilaya:'الجزائر',power:'500 KVA',fuel:'ديزل',withOperator:true,
+   price:35000,unit:'يوم',rating:4.8,reviews:31,avail:'green',
+   bg:'linear-gradient(135deg,#2d1270,#5228b0)',icon:'fa-bolt'},
+  {id:'G2',cat:'gen',name:'مولد Perkins 200 KVA محمول',owner:'عبد الكريم نور',phone:'0550567894',
+   wilaya:'بسكرة',power:'200 KVA',fuel:'ديزل',
+   price:18000,unit:'يوم',rating:4.7,reviews:19,avail:'green',
+   bg:'linear-gradient(135deg,#241060,#421e96)',icon:'fa-bolt'},
+
+  // ── PUMPS ──
+  {id:'P1',cat:'pump',name:'مضخة ري Grundfos CR 32',owner:'تقني الري',phone:'0660678905',
+   wilaya:'تيارت',flow:'32 م³/ساعة',head:'80 م',
+   price:5000,unit:'يوم',rating:4.7,reviews:22,avail:'green',
+   bg:'linear-gradient(135deg,#0a4a3a,#1a7a60)',icon:'fa-faucet-drip'},
+  {id:'P2',cat:'pump',name:'مضخة طرد مركزي DAB KPS',owner:'هواري بلعيد',phone:'0550789016',
+   wilaya:'معسكر',flow:'18 م³/ساعة',head:'45 م',
+   price:3500,unit:'يوم',rating:4.6,reviews:14,avail:'green',
+   bg:'linear-gradient(135deg,#0c4535,#1a7255)',icon:'fa-faucet-drip'},
+
+  // ── MORE AGRI ──
+  {id:'A5',cat:'agri',name:'محراث قرصي Kverneland',owner:'قادة بلال',phone:'0770890130',
+   wilaya:'سعيدة',price:6500,unit:'يوم',year:2021,
+   rating:4.8,reviews:23,avail:'green',
+   bg:'linear-gradient(135deg,#155220,#268a35)',icon:'fa-tractor'},
+  {id:'A6',cat:'agri',name:'رشاش مروحي ذراع 24م',owner:'مزرعة الوسط الأخضر',phone:'0660901234',
+   wilaya:'تيارت',price:7500,unit:'يوم',year:2022,
+   rating:4.9,reviews:38,avail:'yellow',
+   bg:'linear-gradient(135deg,#0f4d18,#1f8030)',icon:'fa-tractor'},
+
+  // ── MORE TRANSPORT ──
+  {id:'T5',cat:'transport',name:'شاحنة صهريج ماء 20,000 لتر',owner:'شركة نقل المياه',phone:'0550456012',
+   wilaya:'بسكرة',capacity:'20,000 لتر',withDriver:true,price:12000,unit:'يوم',
+   rating:4.5,reviews:11,avail:'green',
+   bg:'linear-gradient(135deg,#0d2a5e,#1a4598)',icon:'fa-truck'},
+
+  // ── MORE ORGANIC ──
+  {id:'O5',cat:'organic',listingType:'sell',materialType:'مخلفات زيتون',
+   name:'تفل زيتون — مناسب للتسميد والوقود',owner:'معصرة الزيتون',phone:'0770123460',
+   wilaya:'تيزي وزو',quantity:'80 طن',quality:3,certified:false,
+   price:800,unit:'طن',rating:4.4,reviews:9,avail:'green',
+   bg:'linear-gradient(135deg,#2a3d0a,#4a6e10)',icon:'fa-recycle'},
+
+  // ── MORE INPUTS ──
+  {id:'I4',cat:'inputs',name:'نظام ري بالتقطير Netafim',owner:'محلات الري الحديث',phone:'0550678910',
+   wilaya:'وهران',quantity:'1000 م خرطوم',
+   price:28000,unit:'وحدة',rating:4.8,reviews:52,avail:'green',
+   bg:'linear-gradient(135deg,#6e1818,#b02828)',icon:'fa-box-open'},
+];
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let currentCat = null;
+let currentUser = JSON.parse(localStorage.getItem('hba_user') || 'null');
+let userListings = JSON.parse(localStorage.getItem('hba_mylistings') || '[]');
+let favorites = JSON.parse(localStorage.getItem('hba_favs') || '[]');
+let currentSort = 'default';
+let filtered = [...LISTINGS];
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+function init(){
+  buildCats();
+  applyFilters();
+  updateAuthBtn();
+  updateAddForm();
+  initWeather();
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('intDate').value=today;
+}
+
+// ════════════════════════════════════════
+// WEATHER (simulated)
+// ════════════════════════════════════════
+function initWeather(){
+  const weathers=[
+    {temp:'28°C — مشمس',wind:'ريح 15 كم/س',humid:'رطوبة 42%',tip:'مناسب للحرث والبذر اليوم',icon:'fa-sun'},
+    {temp:'22°C — غائم جزئياً',wind:'ريح 20 كم/س',humid:'رطوبة 58%',tip:'تجنب رش المبيدات — ريح نسبية',icon:'fa-cloud-sun'},
+    {temp:'35°C — حار',wind:'ريح 8 كم/س',humid:'رطوبة 25%',tip:'أوقات الري المثلى: فجراً ومساءً',icon:'fa-temperature-high'},
+    {temp:'19°C — ماطر',wind:'ريح 12 كم/س',humid:'رطوبة 82%',tip:'تجنب العمليات الميكانيكية في الحقل',icon:'fa-cloud-rain'},
+  ];
+  const w=weathers[Math.floor(Math.random()*weathers.length)];
+  document.getElementById('wTemp').textContent=w.temp;
+  document.getElementById('wWind').textContent=w.wind;
+  document.getElementById('wHumid').textContent=w.humid;
+  document.getElementById('wTip').textContent=w.tip;
+}
+
+function buildCats(){
+  const el = document.getElementById('catsInner');
+  el.innerHTML = CATS.map(c=>`
+    <div class="cat-pill${currentCat===c.id?' active':''}"
+         style="color:${c.color}"
+         onclick="selectCat(${JSON.stringify(c.id)})">
+      <i class="fa-solid ${c.icon}"></i>
+      <span>${c.label}</span>
+    </div>`).join('');
+}
+
+function selectCat(id){
+  currentCat = id;
+  buildCats();
+  applyFilters();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function applyFilters(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const w = document.getElementById('wilayaFilter').value;
+  const a = document.getElementById('availFilter').value;
+  const minP = parseInt(document.getElementById('priceMin')?.value)||0;
+  const maxP = parseInt(document.getElementById('priceMax')?.value)||Infinity;
+  const all = [...LISTINGS, ...userListings];
+  filtered = all.filter(l=>{
+    if(currentCat && l.cat !== currentCat) return false;
+    if(w && l.wilaya !== w) return false;
+    if(a && l.avail !== a) return false;
+    if(minP && (l.price||0) < minP) return false;
+    if(maxP < Infinity && (l.price||0) > maxP) return false;
+    if(q && !l.name.toLowerCase().includes(q) &&
+       !(l.owner||'').toLowerCase().includes(q) &&
+       !(l.wilaya||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  sortFiltered();
+  renderListings();
+}
+
+function setSort(s, btn){
+  currentSort=s;
+  document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  sortFiltered();
+  renderListings();
+}
+function sortFiltered(){
+  if(currentSort==='price_asc') filtered.sort((a,b)=>(a.price||0)-(b.price||0));
+  else if(currentSort==='price_desc') filtered.sort((a,b)=>(b.price||0)-(a.price||0));
+  else if(currentSort==='rating') filtered.sort((a,b)=>(b.rating||0)-(a.rating||0));
+}
+
+
+function buildCard(l){
+  const availMap={green:'متاح',yellow:'مشغول جزئياً',red:'غير متاح'};
+  const availBadge=`<span class="badge avail ${l.avail}">${availMap[l.avail]||''}</span>`;
+  const insuranceBadge = l.insuranceRequired ? `<span class="badge insurance"><i class="fa-solid fa-shield-halved"></i> تأمين مطلوب</span>` : '';
+  const organicBadge = l.certified ? `<span class="badge organic"><i class="fa-solid fa-leaf"></i> عضوي معتمد</span>` : '';
+
+  let routeHtml = '';
+  if(l.from && l.to){
+    routeHtml=`<div class="card-route"><i class="fa-solid fa-route"></i>${l.from} <i class="fa-solid fa-arrow-left" style="font-size:10px"></i> ${l.to} — ${l.distance||''}</div>`;
+  }
+  let typeTag = '';
+  if(l.listingType==='sell') typeTag=`<span class="organic-type organic-sell">عرض بيع</span>`;
+  if(l.listingType==='buy')  typeTag=`<span class="organic-type organic-buy">طلب شراء</span>`;
+
+  let tempHtml = '';
+  if(l.tempRange) tempHtml=`<div class="meta-chip"><i class="fa-solid fa-thermometer-half"></i>${l.tempRange}</div>`;
+
+  let qualHtml = '';
+  if(l.quality){
+    const stars='<i class="fa-solid fa-star"></i>'.repeat(l.quality)+'<i class="fa-regular fa-star"></i>'.repeat(5-l.quality);
+    qualHtml=`<div class="quality-stars">${stars}</div>`;
+  }
+
+  const meta=[];
+  if(l.wilaya) meta.push(`<div class="meta-chip"><i class="fa-solid fa-location-dot"></i>${l.wilaya}</div>`);
+  if(l.capacity) meta.push(`<div class="meta-chip"><i class="fa-solid fa-weight-hanging"></i>${l.capacity}</div>`);
+  if(l.power && l.cat!=='gen') meta.push(`<div class="meta-chip"><i class="fa-solid fa-gauge"></i>${l.power}</div>`);
+  if(l.power && l.cat==='gen') meta.push(`<div class="meta-chip"><i class="fa-solid fa-bolt"></i>${l.power}</div>`);
+  if(l.year) meta.push(`<div class="meta-chip"><i class="fa-solid fa-calendar"></i>${l.year}</div>`);
+  if(l.quantity) meta.push(`<div class="meta-chip"><i class="fa-solid fa-cubes"></i>${l.quantity}</div>`);
+  if(l.area) meta.push(`<div class="meta-chip"><i class="fa-solid fa-ruler-combined"></i>${l.area}</div>`);
+  if(l.withDriver) meta.push(`<div class="meta-chip"><i class="fa-solid fa-user-tie"></i>مع سائق</div>`);
+  if(l.withOperator) meta.push(`<div class="meta-chip"><i class="fa-solid fa-user-cog"></i>مع مشغّل</div>`);
+
+  return `<div class="card" onclick="openDetail('${l.id}')">
+    <div class="card-img" style="background:${l.bg||'linear-gradient(135deg,#276b30,#3da648)'}">
+      <div class="badges">${availBadge}${insuranceBadge}${organicBadge}</div>
+    </div>
+    <div class="card-body">
+      <div class="card-name">${typeTag}${l.name}</div>
+      <div class="card-owner"><i class="fa-solid fa-user-circle"></i>${l.owner||'—'}</div>
+      ${routeHtml}
+      ${tempHtml?`<div style="margin-bottom:6px">${tempHtml}</div>`:''}
+      <div class="card-meta">${meta.join('')}</div>
+      ${qualHtml?`<div style="margin-bottom:6px">${qualHtml}</div>`:''}
+      <div class="card-foot">
+        <div class="card-price">${(l.price||0).toLocaleString('ar-DZ')} دج<span>/${l.unit||''}</span></div>
+        <div class="card-rating"><i class="fa-solid fa-star"></i>${l.rating||'—'} (${l.reviews||0})</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn btn-primary" onclick="event.stopPropagation();openBooking('${l.id}')">
+          <i class="fa-solid fa-calendar-plus"></i> احجز
+        </button>
+        <button class="btn btn-wa" onclick="event.stopPropagation();contactWA('${l.phone||''}','${l.name}')">
+          <i class="fa-brands fa-whatsapp"></i>
+        </button>
+        <button class="btn btn-fav${isFav(l.id)?' active':''}" onclick="event.stopPropagation();toggleFav('${l.id}',this)" title="حفظ">
+          <i class="fa-${isFav(l.id)?'solid':'regular'} fa-heart"></i>
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════
+// INTEGRATED REQUEST BANNER visibility
+// ════════════════════════════════════════
+function renderListings(){
+  const grid = document.getElementById('listingsGrid');
+  const empty = document.getElementById('emptyState');
+  const banner = document.getElementById('integratedBanner');
+  const catObj = CATS.find(c=>c.id===currentCat)||CATS[0];
+  document.getElementById('sectionTitle').textContent = catObj.label;
+  document.getElementById('sectionCount').textContent = filtered.length+' نتيجة';
+  if(banner) banner.style.display = currentCat===null?'flex':'none';
+  if(!filtered.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML = filtered.map(l=>buildCard(l)).join('');
+}
+
+// ════════════════════════════════════════
+// FAVORITES
+// ════════════════════════════════════════
+function isFav(id){ return favorites.includes(String(id)); }
+function toggleFav(id,btn){
+  id=String(id);
+  if(favorites.includes(id)){
+    favorites=favorites.filter(f=>f!==id);
+    btn.classList.remove('active');
+    btn.innerHTML='<i class="fa-regular fa-heart"></i>';
+    showToast('تم إزالة الإعلان من المحفوظات');
+  } else {
+    favorites.push(id);
+    btn.classList.add('active');
+    btn.innerHTML='<i class="fa-solid fa-heart"></i>';
+    showToast('تم حفظ الإعلان');
+  }
+  localStorage.setItem('hba_favs',JSON.stringify(favorites));
+}
+function openFavorites(){
+  const all=[...LISTINGS,...userListings];
+  const favItems=all.filter(l=>favorites.includes(String(l.id)));
+  const body=document.getElementById('favBody');
+  body.innerHTML=favItems.length?favItems.map(l=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--g8);border-radius:8px;margin-bottom:8px;cursor:pointer" onclick="openDetail('${l.id}');closeModal('favOverlay')">
+      <div style="width:48px;height:48px;border-radius:8px;background:${l.bg||'#276b30'};flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700">${l.name}</div>
+        <div style="font-size:11px;color:#888">${l.wilaya} — ${(l.price||0).toLocaleString('ar-DZ')} دج/${l.unit}</div>
+      </div>
+      <button class="btn btn-fav active" onclick="event.stopPropagation();toggleFav('${l.id}',this);openFavorites()" style="font-size:12px">
+        <i class="fa-solid fa-heart"></i>
+      </button>
+    </div>`).join(''):'<div class="empty"><i class="fa-regular fa-heart"></i><p>لا توجد إعلانات محفوظة بعد</p></div>';
+  openModal('favOverlay');
+}
+
+// ════════════════════════════════════════
+// NOTIFICATIONS
+// ════════════════════════════════════════
+function openNotifications(){ openModal('notifOverlay'); }
+function clearNotifBadge(){
+  const badge=document.getElementById('notifBadge');
+  badge.style.display='none';
+  document.querySelectorAll('.notif-item.unread').forEach(n=>n.classList.remove('unread'));
+}
+
+// ════════════════════════════════════════
+// CHAT
+// ════════════════════════════════════════
+let chatListingId=null;
+function openChatFor(id){
+  chatListingId=id;
+  const l=[...LISTINGS,...userListings].find(x=>x.id==id);
+  document.getElementById('chatTitle').innerHTML=`<i class="fa-solid fa-comment-dots"></i> محادثة — ${l?.owner||'المالك'}`;
+  openModal('chatOverlay');
+  closeModal('detailOverlay');
+}
+function sendChatMsg(){
+  const input=document.getElementById('chatInput');
+  const msg=input.value.trim();
+  if(!msg) return;
+  const msgs=document.getElementById('chatMessages');
+  const now=new Date().toLocaleTimeString('ar-DZ',{hour:'2-digit',minute:'2-digit'});
+  msgs.innerHTML+=`<div class="msg sent"><div>${msg}</div><div class="msg-time">${now}</div></div>`;
+  input.value='';
+  msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    const replies=['حسناً، سأتحقق من الجدول وأرد عليك','شكراً، سأتصل بك قريباً','المعدة متاحة، تفضل بالحجز'];
+    const r=replies[Math.floor(Math.random()*replies.length)];
+    msgs.innerHTML+=`<div class="msg recv"><div>${r}</div><div class="msg-time">${new Date().toLocaleTimeString('ar-DZ',{hour:'2-digit',minute:'2-digit'})}</div></div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  },1200);
+}
+
+// ════════════════════════════════════════
+// INTEGRATED REQUEST
+// ════════════════════════════════════════
+function openIntegrated(){
+  if(!currentUser){ showToast('يجب تسجيل الدخول أولاً'); openAuth(); return; }
+  openModal('integratedOverlay');
+}
+function submitIntegrated(){
+  const agri=document.getElementById('intAgri').value;
+  const transport=document.getElementById('intTransport').value;
+  const phone=document.getElementById('intPhone').value.trim();
+  if(!phone){ showToast('أدخل رقم هاتفك'); return; }
+  closeModal('integratedOverlay');
+  showToast('✅ تم إرسال طلبك المتكامل — ستتلقى اتصالاً خلال ساعة');
+}
+
+// ════════════════════════════════════════
+// SHARE
+// ════════════════════════════════════════
+function shareListing(id){
+  const l=[...LISTINGS,...userListings].find(x=>x.id==id);
+  if(!l) return;
+  const text=`🌾 ${l.name}\n📍 ${l.wilaya} — ${(l.price||0).toLocaleString('ar-DZ')} دج/${l.unit}\nعبر منصة هيباغري`;
+  if(navigator.share){
+    navigator.share({title:l.name,text}).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(text);
+    showToast('تم نسخ معلومات الإعلان');
+  }
+}
+
+// ════════════════════════════════════════
+// DETAIL
+// ════════════════════════════════════════
+function openDetail(id){
+  const l = [...LISTINGS,...userListings].find(x=>x.id==id);
+  if(!l) return;
+  document.getElementById('detailTitle').textContent = l.name;
+  const specs=[];
+  if(l.wilaya) specs.push({k:'الولاية',v:l.wilaya,i:'fa-location-dot'});
+  if(l.capacity) specs.push({k:'الحمولة',v:l.capacity,i:'fa-weight-hanging'});
+  if(l.power) specs.push({k:'القدرة',v:l.power,i:'fa-gauge'});
+  if(l.year) specs.push({k:'سنة الصنع',v:l.year,i:'fa-calendar'});
+  if(l.from) specs.push({k:'من',v:l.from,i:'fa-map-marker'});
+  if(l.to) specs.push({k:'إلى',v:l.to,i:'fa-flag'});
+  if(l.distance) specs.push({k:'المسافة',v:l.distance,i:'fa-route'});
+  if(l.area) specs.push({k:'المساحة',v:l.area,i:'fa-ruler'});
+  if(l.tempRange) specs.push({k:'درجة الحرارة',v:l.tempRange,i:'fa-thermometer'});
+  if(l.humidity) specs.push({k:'الرطوبة',v:l.humidity,i:'fa-droplet'});
+  if(l.quantity) specs.push({k:'الكمية',v:l.quantity,i:'fa-cubes'});
+  if(l.insuranceExpiry) specs.push({k:'انتهاء التأمين',v:l.insuranceExpiry,i:'fa-shield'});
+  if(l.certification) specs.push({k:'الشهادة',v:l.certification,i:'fa-certificate'});
+
+  const specHtml = specs.map(s=>`
+    <div class="spec-item">
+      <div class="spec-label"><i class="fa-solid ${s.i}"></i> ${s.k}</div>
+      <div class="spec-value">${s.v}</div>
+    </div>`).join('');
+
+  const reviews=[
+    {n:'أحمد س.',t:'خدمة ممتازة وصاحبها محترم',r:5},
+    {n:'فاطمة ب.',t:'الآلة في حالة ممتازة، ننصح بها',r:5},
+    {n:'محمد ر.',t:'كل شيء تمام، نعاود',r:4},
+  ];
+  const revHtml=reviews.map(r=>`
+    <div class="review-item">
+      <div class="review-avatar"><i class="fa-solid fa-user"></i></div>
+      <div>
+        <div class="review-name">${r.n} ${'<i class="fa-solid fa-star" style="color:var(--gold);font-size:11px"></i>'.repeat(r.r)}</div>
+        <div class="review-text">${r.t}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('detailBody').innerHTML=`
+    <div class="detail-img" style="background:${l.bg||'linear-gradient(135deg,#276b30,#3da648)'}">
+      <span class="badge avail ${l.avail}" style="font-size:13px">${l.avail==='green'?'متاح الآن':l.avail==='yellow'?'مشغول جزئياً':'غير متاح'}</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:22px;font-weight:900;color:var(--g3)">${(l.price||0).toLocaleString('ar-DZ')} دج<span style="font-size:13px;font-weight:400;color:#888">/${l.unit}</span></div>
+      <div style="font-size:13px;color:#888"><i class="fa-solid fa-star" style="color:var(--gold)"></i> ${l.rating} (${l.reviews} تقييم)</div>
+    </div>
+    <div style="font-size:13px;color:#555;margin-bottom:12px"><i class="fa-solid fa-user-circle"></i> ${l.owner}</div>
+    ${l.insuranceRequired?'<div style="background:#fee2e2;color:#991b1b;border-radius:8px;padding:10px;font-size:13px;margin-bottom:12px"><i class="fa-solid fa-shield-exclamation"></i> <strong>تنبيه:</strong> هذه المعدة تتطلب تأمين إلزامي قبل الاستخدام — يرجى التحقق من صلاحية وثيقة التأمين</div>':''}
+    <div class="detail-specs">${specHtml}</div>
+    <div style="margin:14px 0 6px;font-weight:700;font-size:14px">تقييمات المستخدمين</div>
+    ${revHtml}
+    <div class="card-actions" style="margin-top:16px">
+      <button class="btn btn-primary" onclick="openBooking('${l.id}');closeModal('detailOverlay')"><i class="fa-solid fa-calendar-plus"></i> احجز الآن</button>
+      <button class="btn btn-wa" onclick="contactWA('${l.phone||''}','${l.name}')"><i class="fa-brands fa-whatsapp"></i> واتساب</button>
+      <button class="btn btn-outline" onclick="openChatFor('${l.id}')"><i class="fa-solid fa-comment"></i></button>
+      <button class="btn btn-outline" onclick="shareListing('${l.id}')"><i class="fa-solid fa-share-nodes"></i></button>
+    </div>`;
+  openModal('detailOverlay');
+}
+
+// ════════════════════════════════════════
+// BOOKING
+// ════════════════════════════════════════
+let bookingListingId = null;
+function openBooking(id){
+  bookingListingId = id;
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('bookFrom').value = today;
+  document.getElementById('bookTo').value = today;
+  document.getElementById('bookNote').value = '';
+  document.getElementById('bookPhone').value = currentUser?.phone||'';
+  openModal('bookingOverlay');
+}
+function confirmBooking(){
+  showToast('✅ تم إرسال طلب الحجز بنجاح');
+  closeModal('bookingOverlay');
+}
+
+// ════════════════════════════════════════
+// WHATSAPP
+// ════════════════════════════════════════
+function contactWA(phone, name){
+  if(!phone){ showToast('رقم الهاتف غير متوفر'); return; }
+  const msg = encodeURIComponent(`السلام عليكم، رأيت إعلان "${name}" على منصة هيباغري وأريد الاستفسار.`);
+  window.open(`https://wa.me/213${phone.replace(/^0/,'')}?text=${msg}`,'_blank');
+}
+
+// ════════════════════════════════════════
+// AI DIAGNOSIS
+// ════════════════════════════════════════
+const AI_DIAGNOSES = [
+  {disease:'صدأ القمح',confidence:92,treatment:'رش مبيد Propiconazole بتركيز 0.1% كل 14 يوم',urgent:true},
+  {disease:'بياض الدقيقي',confidence:87,treatment:'رش كبريت رطب أو مبيد Myclobutanil',urgent:false},
+  {disease:'لفحة المبكرة للطماطم',confidence:78,treatment:'إزالة الأوراق المصابة ورش Mancozeb',urgent:true},
+  {disease:'تعفن الجذور',confidence:83,treatment:'تحسين صرف التربة وتقليل الري',urgent:true},
+  {disease:'حشرة المن',confidence:95,treatment:'رش صابون الحشرات أو Imidacloprid',urgent:false},
+  {disease:'نقص الحديد (الاصفرار)',confidence:89,treatment:'رش كيلات الحديد على الأوراق أو إضافته للتربة',urgent:false},
+];
+function openAI(){ openModal('aiOverlay'); document.getElementById('aiResult').style.display='none'; }
+function analyzeImage(input){
+  if(!input.files||!input.files[0]) return;
+  runDiagnosis();
+}
+function analyzeText(){
+  const t=document.getElementById('aiText').value.trim();
+  if(!t){ showToast('أدخل وصف الأعراض أولاً'); return; }
+  runDiagnosis();
+}
+function runDiagnosis(){
+  const res = document.getElementById('aiResult');
+  res.style.display='block';
+  res.innerHTML='<div style="text-align:center;padding:20px"><i class="fa-solid fa-spinner fa-spin fa-2x" style="color:var(--g5)"></i><p style="margin-top:8px;color:#666;font-size:13px">جاري التحليل...</p></div>';
+  setTimeout(()=>{
+    const d = AI_DIAGNOSES[Math.floor(Math.random()*AI_DIAGNOSES.length)];
+    res.innerHTML=`
+      <div class="ai-result">
+        <div class="ai-result-title">
+          <i class="fa-solid fa-bug-slash" style="color:${d.urgent?'#dc2626':'#276b30'}"></i>
+          ${d.disease}
+          ${d.urgent?'<span style="background:#fee2e2;color:#dc2626;border-radius:20px;padding:2px 8px;font-size:11px">عاجل</span>':''}
+        </div>
+        <div class="confidence">
+          <span style="font-size:12px;color:#666;min-width:60px">دقة التشخيص</span>
+          <div class="conf-bar"><div class="conf-fill" style="width:${d.confidence}%"></div></div>
+          <span style="font-size:13px;font-weight:700;color:var(--g4)">${d.confidence}%</span>
+        </div>
+        <div style="font-size:13px;color:#444;line-height:1.6">
+          <strong>العلاج الموصى به:</strong><br>${d.treatment}
+        </div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--g8);font-size:12px;color:#888">
+          <i class="fa-solid fa-triangle-exclamation"></i> هذا التشخيص استرشادي. استشر مهندساً زراعياً للتأكيد.
+        </div>
+      </div>`;
+  }, 2200);
+}
+
+// ════════════════════════════════════════
+// ADD LISTING
+// ════════════════════════════════════════
+function openAdd(){
+  if(!currentUser){ showToast('يجب تسجيل الدخول أولاً'); openAuth(); return; }
+  openModal('addOverlay');
+}
+function updateAddForm(){
+  const cat = document.getElementById('addCat').value;
+  const extra = document.getElementById('addExtraFields');
+  let html='';
+  if(cat==='transport'){
+    html=`
+      <div class="form-group"><label class="form-label">من (مدينة الانطلاق)</label><input class="form-input" id="addFrom" placeholder="وهران"/></div>
+      <div class="form-group"><label class="form-label">إلى (مدينة الوصول)</label><input class="form-input" id="addTo" placeholder="الجزائر العاصمة"/></div>
+      <div class="form-group"><label class="form-label">الحمولة القصوى</label><input class="form-input" id="addCapacity" placeholder="مثال: 30 طن"/></div>`;
+  } else if(cat==='const'){
+    html=`
+      <div class="form-group"><label class="form-label">نوع المعدة</label><input class="form-input" id="addEquipType" placeholder="رافعة / حفارة / بلدوزر"/></div>
+      <div class="form-group"><label class="form-label">تاريخ انتهاء التأمين</label><input class="form-input" id="addInsurance" type="date"/><div class="form-hint"><i class="fa-solid fa-shield-halved" style="color:#dc2626"></i> التأمين إلزامي لمعدات الأشغال</div></div>`;
+  } else if(cat==='organic'){
+    html=`
+      <div class="form-group"><label class="form-label">نوع الإعلان</label><select class="form-select" id="addListingType"><option value="sell">عرض بيع</option><option value="buy">طلب شراء</option></select></div>
+      <div class="form-group"><label class="form-label">نوع المادة العضوية</label><select class="form-select" id="addMaterial"><option>سباخ بقري</option><option>زرق دجاج</option><option>مخلفات نباتية</option><option>سماد عضوي مُركَّب</option><option>سماد خضروات</option></select></div>
+      <div class="form-group"><label class="form-label">الكمية المتاحة (طن)</label><input class="form-input" id="addQty" type="number" placeholder="100"/></div>`;
+  } else if(cat==='storage'){
+    html=`
+      <div class="form-group"><label class="form-label">نوع المستودع</label><select class="form-select" id="addStorageType"><option>تبريد</option><option>جاف</option><option>متنقل</option></select></div>
+      <div class="form-group"><label class="form-label">نطاق درجة الحرارة</label><input class="form-input" id="addTemp" placeholder="-18°C → +4°C"/></div>
+      <div class="form-group"><label class="form-label">المساحة (م²)</label><input class="form-input" id="addArea" type="number" placeholder="500"/></div>`;
+  }
+  extra.innerHTML=html;
+}
+function submitListing(){
+  const name=document.getElementById('addName').value.trim();
+  const price=parseInt(document.getElementById('addPrice').value)||0;
+  const unit=document.getElementById('addUnit').value;
+  const wilaya=document.getElementById('addWilaya').value;
+  const phone=document.getElementById('addPhone').value.trim();
+  const cat=document.getElementById('addCat').value;
+  if(!name||!price||!phone){ showToast('يرجى ملء جميع الحقول المطلوبة'); return; }
+  const newItem={
+    id:'U'+Date.now(),cat,name,owner:currentUser.name,phone,
+    wilaya,price,unit,rating:0,reviews:0,avail:'green',
+    bg:'linear-gradient(135deg,#276b30,#3da648)',icon:'fa-star',
+    listingType:document.getElementById('addListingType')?.value,
+    from:document.getElementById('addFrom')?.value,
+    to:document.getElementById('addTo')?.value,
+    capacity:document.getElementById('addCapacity')?.value,
+    insuranceExpiry:document.getElementById('addInsurance')?.value,
+  };
+  userListings.push(newItem);
+  localStorage.setItem('hba_mylistings',JSON.stringify(userListings));
+  closeModal('addOverlay');
+  applyFilters();
+  showToast('✅ تم نشر إعلانك بنجاح');
+}
+
+// ════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════
+function openAuth(){ if(currentUser){ openProfile(); return; } openModal('authOverlay'); }
+function switchAuthTab(tab){
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',i===(tab==='login'?0:1)));
+  document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
+  document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
+}
+function sendOTP(mode){
+  const phone=document.getElementById(mode==='login'?'loginPhone':'regPhone').value;
+  if(!phone||phone.length<10){ showToast('أدخل رقم هاتف صحيح'); return; }
+  document.getElementById(mode==='login'?'loginOTPWrap':'regOTPWrap').style.display='block';
+  showToast('📱 تم إرسال رمز التحقق (افتراضي: 123456)');
+}
+function verifyOTP(mode){
+  const otp=document.getElementById(mode==='login'?'loginOTP':'regOTP').value;
+  if(otp!=='123456'){ showToast('❌ رمز التحقق غير صحيح'); return; }
+  if(mode==='register'){
+    const name=document.getElementById('regName').value.trim();
+    const phone=document.getElementById('regPhone').value;
+    const wilaya=document.getElementById('regWilaya').value;
+    const type=document.getElementById('regType').value;
+    if(!name){ showToast('أدخل اسمك أولاً'); return; }
+    currentUser={name,phone,wilaya,type,joined:new Date().toLocaleDateString('ar-DZ')};
+  } else {
+    const phone=document.getElementById('loginPhone').value;
+    currentUser=currentUser||{name:'مستخدم',phone,wilaya:'—',type:'farmer'};
+    currentUser.phone=phone;
+  }
+  localStorage.setItem('hba_user',JSON.stringify(currentUser));
+  updateAuthBtn();
+  closeModal('authOverlay');
+  showToast('✅ مرحباً '+currentUser.name);
+}
+function logout(){
+  currentUser=null;
+  localStorage.removeItem('hba_user');
+  updateAuthBtn();
+  closeModal('profileOverlay');
+  showToast('تم تسجيل الخروج');
+}
+function updateAuthBtn(){
+  const btn=document.getElementById('authBtn');
+  if(currentUser){
+    btn.innerHTML=`<i class="fa-solid fa-user-check"></i><span>${currentUser.name.split(' ')[0]}</span>`;
+    btn.onclick=openProfile;
+    btn.style.background='var(--g5)';
+  } else {
+    btn.innerHTML='<i class="fa-solid fa-user"></i><span>دخول</span>';
+    btn.onclick=openAuth;
+    btn.style.background='';
+  }
+}
+
+// ════════════════════════════════════════
+// PROFILE
+// ════════════════════════════════════════
+function openProfile(){
+  if(!currentUser){ openAuth(); return; }
+  document.getElementById('profileAvatar').textContent=currentUser.name[0]||'م';
+  document.getElementById('profileName').textContent=currentUser.name;
+  document.getElementById('profilePhone').textContent=currentUser.phone;
+  document.getElementById('pstatListings').textContent=userListings.length;
+  document.getElementById('pstatBookings').textContent='0';
+  document.getElementById('pstatRating').textContent='—';
+  document.getElementById('settingsName').value=currentUser.name;
+  document.getElementById('settingsWilaya').value=currentUser.wilaya||'';
+  const mc=document.getElementById('myListingsContainer');
+  mc.innerHTML=userListings.length?userListings.map(l=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--g8);border-radius:8px;margin-bottom:8px">
+      <div style="width:40px;height:40px;border-radius:8px;background:${l.bg||'#276b30'};flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:700">${l.name}</div><div style="font-size:11px;color:#888">${l.wilaya} — ${l.price?.toLocaleString('ar-DZ')} دج/${l.unit}</div></div>
+    </div>`).join(''):'<div class="empty"><i class="fa-solid fa-box-open"></i><p>لم تضف أي إعلان بعد</p></div>';
+  openModal('profileOverlay');
+}
+function switchProfileTab(tab){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ptab-content').forEach(t=>t.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+function saveSettings(){
+  currentUser.name=document.getElementById('settingsName').value.trim()||currentUser.name;
+  currentUser.wilaya=document.getElementById('settingsWilaya').value.trim()||currentUser.wilaya;
+  localStorage.setItem('hba_user',JSON.stringify(currentUser));
+  updateAuthBtn();
+  showToast('✅ تم حفظ الإعدادات');
+}
+
+// ════════════════════════════════════════
+// MODAL HELPERS
+// ════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); });
+});
+
+// ════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ════════════════════════════════════════
+// START
+// ════════════════════════════════════════
+init();
+
+// Register SW for PWA (optional offline support)
+if('serviceWorker' in navigator){
+  const swCode=`
+    const CACHE='hibagri-v1';
+    self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['.']))));
+    self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
+  `;
+  const blob=new Blob([swCode],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
+</script>
+</body>
+</html>
