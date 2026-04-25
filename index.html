@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --g1:#0d2610;--g2:#163d1b;--g3:#1f5426;--g4:#276b30;--g5:#3da648;
@@ -973,26 +974,136 @@ const LISTINGS = [
 ];
 
 // ════════════════════════════════════════
+// SUPABASE INIT
+// ════════════════════════════════════════
+const SUPA_URL = 'https://bxcllhikeokcabzchgly.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4Y2xsaGlrZW9rY2FiemNoZ2x5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzc0NTMsImV4cCI6MjA5MjcxMzQ1M30.u6v9gIUf9eiksJc_6fCEuinWOCPyRXAgjS444xCw6Sg';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// ════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════
 let currentCat = null;
 let currentUser = JSON.parse(localStorage.getItem('hba_user') || 'null');
-let userListings = JSON.parse(localStorage.getItem('hba_mylistings') || '[]');
-let favorites = JSON.parse(localStorage.getItem('hba_favs') || '[]');
+let userListings = [];
+let favorites = [];
 let currentSort = 'default';
 let filtered = [...LISTINGS];
+let dbListings = [];
 
 // ════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════
-function init(){
+async function init(){
   buildCats();
-  applyFilters();
   updateAuthBtn();
   updateAddForm();
   initWeather();
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('intDate').value=today;
+  await loadFromSupabase();
+}
+
+// ════════════════════════════════════════
+// SUPABASE DATA LAYER
+// ════════════════════════════════════════
+async function loadFromSupabase(){
+  showLoading(true);
+  try {
+    // Load listings from Supabase
+    const {data,error} = await supa.from('listings').select('*').order('created_at',{ascending:false});
+    if(!error && data && data.length>0){
+      dbListings = data.map(normalizeDbListing);
+    }
+    // Load favorites if logged in
+    if(currentUser?.phone){
+      const {data:favs} = await supa.from('favorites').select('listing_id').eq('user_phone',currentUser.phone);
+      favorites = (favs||[]).map(f=>f.listing_id);
+    }
+  } catch(e){ console.log('Supabase offline, using local data'); }
+  showLoading(false);
+  applyFilters();
+}
+
+function normalizeDbListing(r){
+  return {
+    id:r.id, cat:r.cat, name:r.name, owner:r.owner_name, phone:r.phone,
+    wilaya:r.wilaya, price:r.price, unit:r.unit, avail:r.avail||'green',
+    bg:r.bg||'linear-gradient(135deg,#276b30,#3da648)',
+    rating:r.rating||4.5, reviews:r.reviews||0,
+    from:r.from_city, to:r.to_city, distance:r.distance,
+    capacity:r.capacity, withDriver:r.with_driver, withOperator:r.with_operator,
+    insuranceRequired:r.insurance_required, insuranceExpiry:r.insurance_expiry,
+    listingType:r.listing_type, materialType:r.material_type,
+    quantity:r.quantity, quality:r.quality, certified:r.certified, certification:r.certification,
+    storageType:r.storage_type, tempRange:r.temp_range, area:r.area,
+    humidity:r.humidity, hasDock:r.has_dock,
+    year:r.year, power:r.power, fuel:r.fuel, flow:r.flow,
+    _fromDb:true
+  };
+}
+
+function getAllListings(){
+  // Merge: DB listings first, then local LISTINGS if not already in DB
+  const dbIds = new Set(dbListings.map(l=>l.id));
+  const localOnly = LISTINGS.filter(l=>!dbIds.has(l.id));
+  return [...dbListings, ...localOnly];
+}
+
+async function saveListingToDb(item){
+  const row = {
+    id:item.id, cat:item.cat, name:item.name, owner_name:item.owner, phone:item.phone,
+    wilaya:item.wilaya, price:item.price, unit:item.unit, avail:'green',
+    bg:item.bg||'linear-gradient(135deg,#276b30,#3da648)',
+    from_city:item.from, to_city:item.to, distance:item.distance,
+    capacity:item.capacity, with_driver:!!item.withDriver,
+    insurance_required:!!item.insuranceRequired, insurance_expiry:item.insuranceExpiry||null,
+    listing_type:item.listingType, material_type:item.materialType,
+    quantity:item.quantity, certified:!!item.certified,
+    storage_type:item.storageType, temp_range:item.tempRange, area:item.area,
+  };
+  const {error} = await supa.from('listings').insert(row);
+  if(!error){
+    dbListings.unshift(normalizeDbListing(row));
+  }
+  return !error;
+}
+
+async function saveBookingToDb(booking){
+  const {error} = await supa.from('bookings').insert(booking);
+  return !error;
+}
+
+async function toggleFavDb(listingId, add){
+  if(!currentUser?.phone) return;
+  if(add){
+    await supa.from('favorites').insert({user_phone:currentUser.phone, listing_id:String(listingId)});
+  } else {
+    await supa.from('favorites').delete().eq('user_phone',currentUser.phone).eq('listing_id',String(listingId));
+  }
+}
+
+async function saveProfileToDb(profile){
+  const {error} = await supa.from('profiles').upsert({
+    phone:profile.phone, name:profile.name,
+    wilaya:profile.wilaya||'', account_type:profile.type||'farmer'
+  },{onConflict:'phone'});
+  return !error;
+}
+
+async function saveMsgToDb(listingId, senderPhone, senderName, content){
+  await supa.from('messages').insert({listing_id:listingId, sender_phone:senderPhone, sender_name:senderName, content});
+}
+
+function showLoading(on){
+  let el=document.getElementById('loadingBar');
+  if(!el){
+    el=document.createElement('div');
+    el.id='loadingBar';
+    el.style.cssText='position:fixed;top:0;left:0;right:0;height:3px;background:var(--gold);z-index:999;transition:opacity .3s';
+    document.body.prepend(el);
+  }
+  el.style.opacity=on?'1':'0';
 }
 
 // ════════════════════════════════════════
@@ -1036,7 +1147,7 @@ function applyFilters(){
   const a = document.getElementById('availFilter').value;
   const minP = parseInt(document.getElementById('priceMin')?.value)||0;
   const maxP = parseInt(document.getElementById('priceMax')?.value)||Infinity;
-  const all = [...LISTINGS, ...userListings];
+  const all = getAllListings();
   filtered = all.filter(l=>{
     if(currentCat && l.cat !== currentCat) return false;
     if(w && l.wilaya !== w) return false;
@@ -1156,14 +1267,15 @@ function toggleFav(id,btn){
     favorites=favorites.filter(f=>f!==id);
     btn.classList.remove('active');
     btn.innerHTML='<i class="fa-regular fa-heart"></i>';
+    toggleFavDb(id,false);
     showToast('تم إزالة الإعلان من المحفوظات');
   } else {
     favorites.push(id);
     btn.classList.add('active');
     btn.innerHTML='<i class="fa-solid fa-heart"></i>';
+    toggleFavDb(id,true);
     showToast('تم حفظ الإعلان');
   }
-  localStorage.setItem('hba_favs',JSON.stringify(favorites));
 }
 function openFavorites(){
   const all=[...LISTINGS,...userListings];
@@ -1211,6 +1323,10 @@ function sendChatMsg(){
   const msgs=document.getElementById('chatMessages');
   const now=new Date().toLocaleTimeString('ar-DZ',{hour:'2-digit',minute:'2-digit'});
   msgs.innerHTML+=`<div class="msg sent"><div>${msg}</div><div class="msg-time">${now}</div></div>`;
+  // Save to Supabase
+  if(currentUser?.phone && chatListingId){
+    saveMsgToDb(chatListingId, currentUser.phone, currentUser.name, msg);
+  }
   input.value='';
   msgs.scrollTop=msgs.scrollHeight;
   setTimeout(()=>{
@@ -1329,7 +1445,19 @@ function openBooking(id){
   document.getElementById('bookPhone').value = currentUser?.phone||'';
   openModal('bookingOverlay');
 }
-function confirmBooking(){
+async function confirmBooking(){
+  const all=getAllListings();
+  const l=all.find(x=>x.id==bookingListingId);
+  const booking={
+    listing_id:bookingListingId,
+    listing_name:l?.name||'',
+    user_phone:document.getElementById('bookPhone').value,
+    user_name:currentUser?.name||'',
+    date_from:document.getElementById('bookFrom').value,
+    date_to:document.getElementById('bookTo').value,
+    note:document.getElementById('bookNote').value,
+  };
+  await saveBookingToDb(booking);
   showToast('✅ تم إرسال طلب الحجز بنجاح');
   closeModal('bookingOverlay');
 }
@@ -1443,11 +1571,13 @@ function submitListing(){
     capacity:document.getElementById('addCapacity')?.value,
     insuranceExpiry:document.getElementById('addInsurance')?.value,
   };
-  userListings.push(newItem);
-  localStorage.setItem('hba_mylistings',JSON.stringify(userListings));
+  showLoading(true);
+  const saved = await saveListingToDb(newItem);
+  showLoading(false);
+  if(!saved){ userListings.push(newItem); } // fallback local
   closeModal('addOverlay');
   applyFilters();
-  showToast('✅ تم نشر إعلانك بنجاح');
+  showToast(saved?'✅ تم نشر إعلانك في قاعدة البيانات':'✅ تم نشر إعلانك محلياً');
 }
 
 // ════════════════════════════════════════
@@ -1484,6 +1614,13 @@ function verifyOTP(mode){
   updateAuthBtn();
   closeModal('authOverlay');
   showToast('✅ مرحباً '+currentUser.name);
+  saveProfileToDb(currentUser);
+  // reload favorites from DB
+  if(currentUser.phone){
+    supa.from('favorites').select('listing_id').eq('user_phone',currentUser.phone).then(({data})=>{
+      favorites=(data||[]).map(f=>f.listing_id);
+    });
+  }
 }
 function logout(){
   currentUser=null;
