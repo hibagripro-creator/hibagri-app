@@ -535,6 +535,8 @@ const SUPA_URL = 'https://bxcllhikeokcabzchgly.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4Y2xsaGlrZW9rY2FiemNoZ2x5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzc0NTMsImV4cCI6MjA5MjcxMzQ1M30.u6v9gIUf9eiksJc_6fCEuinWOCPyRXAgjS444xCw6Sg';
 const ADMIN_CODE = 'HIBAGRI2025';
 const OTP = '123456';
+const CDN_CLOUD = 'dxaopj5b7';
+const CDN_PRESET = 'hibagri_upload';
 
 const _H = {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'};
 function _url(table, params) {
@@ -834,6 +836,7 @@ function cardHTML(l) {
   const c = CMAP[l.cat]||{emoji:'📦',label:l.cat||''};
   const u = UNITS[l.unit]||'';
   const featBadge = l.is_featured ? `<span style="position:absolute;bottom:5px;right:5px;background:var(--gold);color:#fff;padding:2px 7px;border-radius:9px;font-size:.6rem;font-weight:700">🏆 مميز</span>` : '';
+  const typeBadge = l.listing_type==='sale' ? `<span style="position:absolute;bottom:5px;left:5px;background:#e53935;color:#fff;padding:2px 7px;border-radius:9px;font-size:.6rem;font-weight:700">🏷️ بيع</span>` : `<span style="position:absolute;bottom:5px;left:5px;background:#1565c0;color:#fff;padding:2px 7px;border-radius:9px;font-size:.6rem;font-weight:700">🔑 كراء</span>`;
   return `
   <div class="card${l.is_featured?' featured':''}" onclick="openDetail('${l.id}')" style="${l.is_featured?'box-shadow:0 2px 12px rgba(245,166,35,.35);border:1.5px solid var(--gold)':''}">
     <div class="card-img">
@@ -842,6 +845,7 @@ function cardHTML(l) {
       <span class="ccat">${c.label}</span>
       <button class="cfav${S.favs.has(l.id)?' on':''}" onclick="toggleFav(event,'${l.id}')"><i class="fas fa-heart"></i></button>
       ${featBadge}
+      ${typeBadge}
     </div>
     <div class="cbody">
       <div class="ctitle">${h(l.name||'')}</div>
@@ -932,6 +936,18 @@ function openAddListing() {
       <p style="font-size:.8rem;color:var(--muted)">أضف صورة (اختياري)</p>
       <img id="add-img-prev" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
     </div>
+    <div class="fg"><label class="fl">نوع العرض *</label>
+      <div style="display:flex;gap:.5rem">
+        <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-weight:700;font-size:.88rem" id="lbl-rent">
+          <input type="radio" name="lst-type" value="rent" checked style="display:none" onchange="document.getElementById('lbl-rent').style.background='var(--p)';document.getElementById('lbl-rent').style.color='#fff';document.getElementById('lbl-rent').style.borderColor='var(--p)';document.getElementById('lbl-sale').style.background='';document.getElementById('lbl-sale').style.color='';document.getElementById('lbl-sale').style.borderColor='var(--border)'">
+          🔑 كراء
+        </label>
+        <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-weight:700;font-size:.88rem" id="lbl-sale">
+          <input type="radio" name="lst-type" value="sale" style="display:none" onchange="document.getElementById('lbl-sale').style.background='var(--p)';document.getElementById('lbl-sale').style.color='#fff';document.getElementById('lbl-sale').style.borderColor='var(--p)';document.getElementById('lbl-rent').style.background='';document.getElementById('lbl-rent').style.color='';document.getElementById('lbl-rent').style.borderColor='var(--border)'">
+          🏷️ بيع
+        </label>
+      </div>
+    </div>
     <div class="fg"><label class="fl">نوع الخدمة *</label><select class="fc" id="add-cat"></select></div>
     <div class="fg"><label class="fl">عنوان الإعلان *</label><input class="fc" id="add-title" type="text" placeholder="مثال: جرار فلاحي للكراء"></div>
     <div class="fg"><label class="fl">وصف مختصر</label><textarea class="fc" id="add-desc" placeholder="اكتب وصفاً للمعدة أو الخدمة..."></textarea></div>
@@ -956,11 +972,28 @@ function fillAddCats2() {
   const s = document.getElementById('add-cat');
   if (s) s.innerHTML = CATS.filter(c=>c.id).map(c=>`<option value="${c.id}">${c.emoji} ${c.label}</option>`).join('');
 }
+let _addImgFile = null;
 function previewAddImg(inp) {
   const f = inp.files[0]; if (!f) return;
+  _addImgFile = f;
   const r = new FileReader();
-  r.onload = e => { const p=document.getElementById('add-img-prev'); p.src=e.target.result; p.style.display='block'; };
+  r.onload = e => {
+    const p = document.getElementById('add-img-prev');
+    p.src = e.target.result; p.style.display = 'block';
+    const up = document.getElementById('add-img-up');
+    if (up) { up.querySelector('i').style.display='none'; up.querySelector('p').style.display='none'; }
+  };
   r.readAsDataURL(f);
+}
+
+async function uploadToCloudinary(file) {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', CDN_PRESET);
+  const r = await fetch(`https://api.cloudinary.com/v1_1/${CDN_CLOUD}/image/upload`, {method:'POST', body:fd});
+  if (!r.ok) throw new Error('فشل رفع الصورة');
+  const d = await r.json();
+  return d.secure_url;
 }
 async function submitListing() {
   if (!S.user) return;
@@ -969,21 +1002,40 @@ async function submitListing() {
   const price = document.getElementById('add-price')?.value;
   const unit  = document.getElementById('add-unit')?.value;
   const wil   = document.getElementById('add-wilaya')?.value;
-  const desc  = document.getElementById('add-desc')?.value.trim();
   const addr  = document.getElementById('add-addr')?.value.trim();
   const phone = document.getElementById('add-phone')?.value.trim();
   if (!title) { toast('أدخل عنوان الإعلان','err'); return; }
   if (!price||isNaN(price)) { toast('أدخل السعر','err'); return; }
   if (!wil) { toast('اختر الولاية','err'); return; }
+
+  const submitBtn = document.querySelector('#add-mo-body .btn-p');
+  if (submitBtn) { submitBtn.disabled=true; submitBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جارٍ النشر...'; }
+
+  let imageUrl = null;
+  if (_addImgFile) {
+    try {
+      if (submitBtn) submitBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جارٍ رفع الصورة...';
+      imageUrl = await uploadToCloudinary(_addImgFile);
+    } catch(e) {
+      toast('تعذّر رفع الصورة، سيُنشر بدون صورة','err');
+    }
+  }
+
+  const lstType = document.querySelector('input[name="lst-type"]:checked')?.value || 'rent';
   const {error} = await db.insert('listings', {
     id: crypto.randomUUID(),
     name: title, cat: cat, price: Number(price), unit: unit,
     wilaya: wil, address: addr||null,
     owner_phone: S.user.phone, phone: phone||S.user.phone,
-    owner_name: S.user.name||'', status: 'active', image_url: null,
+    owner_name: S.user.name||'', status: 'active',
+    image_url: imageUrl,
     is_featured: !!S.user.is_subscribed,
+    listing_type: lstType,
   });
+
+  if (submitBtn) { submitBtn.disabled=false; submitBtn.innerHTML='<i class="fas fa-paper-plane"></i> نشر الإعلان'; }
   if (error) { toast('خطأ في النشر: '+(error.message||''),'err'); return; }
+  _addImgFile = null;
   toast('تم نشر إعلانك بنجاح! 🎉','ok');
   closeMo('add-mo');
   await loadListings();
