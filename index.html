@@ -668,6 +668,7 @@ function showAuth() {
   document.getElementById('l-btn').innerHTML = '<i class="fas fa-arrow-left"></i> متابعة';
   document.getElementById('auth-mo').classList.remove('hide');
   switchAuthTab('login');
+  history.pushState({mo: 'auth-mo'}, '');
 }
 function hideAuth() { document.getElementById('auth-mo').classList.add('hide'); }
 function continueAsGuest() { hideAuth(); toast('تصفح بدون تسجيل — سجّل الدخول لنشر إعلانات','inf'); }
@@ -726,6 +727,8 @@ function regNext(from) {
   }
   if (from === 2) {
     if (!document.getElementById('r-nid').value.trim()) { toast('أدخل رقم بطاقة التعريف','err'); return; }
+    const nidInput = document.querySelector('#nid-area input[type=file]');
+    if (!nidInput || !nidInput.files || !nidInput.files.length) { toast('يجب رفع صورة بطاقة التعريف','err'); return; }
   }
   if (from === 3) {
     document.getElementById('r-phone-disp').textContent = document.getElementById('r-phone').value.trim();
@@ -829,13 +832,15 @@ function renderListings() {
 function cardHTML(l) {
   const c = CMAP[l.cat]||{emoji:'📦',label:l.cat||''};
   const u = UNITS[l.unit]||'';
+  const featBadge = l.is_featured ? `<span style="position:absolute;bottom:5px;right:5px;background:var(--gold);color:#fff;padding:2px 7px;border-radius:9px;font-size:.6rem;font-weight:700">🏆 مميز</span>` : '';
   return `
-  <div class="card" onclick="openDetail('${l.id}')">
+  <div class="card${l.is_featured?' featured':''}" onclick="openDetail('${l.id}')" style="${l.is_featured?'box-shadow:0 2px 12px rgba(245,166,35,.35);border:1.5px solid var(--gold)':''}">
     <div class="card-img">
       ${l.image_url?`<img src="${h(l.image_url)}" onerror="this.style.display='none'" loading="lazy">`:''}
       <span>${c.emoji}</span>
       <span class="ccat">${c.label}</span>
       <button class="cfav${S.favs.has(l.id)?' on':''}" onclick="toggleFav(event,'${l.id}')"><i class="fas fa-heart"></i></button>
+      ${featBadge}
     </div>
     <div class="cbody">
       <div class="ctitle">${h(l.name||'')}</div>
@@ -916,18 +921,10 @@ async function openDetail(id) {
 function openAddListing() {
   if (!S.user) { showAuth(); return; }
   const body = document.getElementById('add-mo-body');
-  if (!S.user.is_subscribed) {
-    body.innerHTML = `
-      <div class="sub-promo">
-        <h3>🔒 مطلوب اشتراك سنوي</h3>
-        <p>لنشر إعلاناتك على هيباغري تحتاج اشتراكاً سنوياً.<br>تواصل مع المدير عبر واتساب لتفعيل اشتراكك.</p>
-        <button class="btn btn-wa" onclick="waCall(null,'${S.adminWA}','الاشتراك في هيباغري')">
-          <i class="fab fa-whatsapp"></i> تواصل مع المدير للاشتراك
-        </button>
-      </div>`;
-    openMo('add-mo'); return;
-  }
-  body.innerHTML = `
+  const featBanner = S.user.is_subscribed
+    ? `<div style="background:linear-gradient(135deg,#fff8e1,#fffde7);border:1px solid #ffe082;border-radius:10px;padding:.6rem .9rem;font-size:.8rem;color:#795548;margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem"><span style="font-size:1.2rem">🏆</span> إعلانك سيظهر <strong>مميزاً</strong> بالنسبة لباقي المستخدمين!</div>`
+    : `<div style="background:var(--bg);border-radius:10px;padding:.6rem .9rem;font-size:.78rem;color:var(--muted);margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem"><span>💡</span> اشترك سنوياً لتظهر إعلاناتك مميزة — <a href="#" onclick="closeMo('add-mo');waCall(null,'${S.adminWA}','طلب اشتراك هيباغري');return false" style="color:var(--p);font-weight:700">تواصل مع المدير</a></div>`;
+  body.innerHTML = featBanner + `
     <div id="add-img-up" style="aspect-ratio:16/9;background:var(--bg);border:2px dashed var(--border);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;cursor:pointer;position:relative;overflow:hidden;margin-bottom:.9rem">
       <input type="file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" onchange="previewAddImg(this)">
       <i class="fas fa-camera" style="font-size:2rem;color:var(--muted)"></i>
@@ -982,6 +979,7 @@ async function submitListing() {
     wilaya: wil, address: addr||null,
     owner_phone: S.user.phone, phone: phone||S.user.phone,
     owner_name: S.user.name||'', status: 'active', image_url: null,
+    is_featured: !!S.user.is_subscribed,
   });
   if (error) { toast('خطأ في النشر: '+(error.message||''),'err'); return; }
   toast('تم نشر إعلانك بنجاح! 🎉','ok');
@@ -1245,9 +1243,19 @@ function waCall(e, phone, title) {
 function showNotifs() { toast('لا توجد إشعارات جديدة','inf'); }
 
 // ══════ MODALS ══════
-function openMo(id) { document.getElementById(id)?.classList.add('show'); }
-function closeMo(id) { document.getElementById(id)?.classList.remove('show'); }
+function openMo(id) {
+  document.getElementById(id)?.classList.add('show');
+  history.pushState({mo: id}, '');
+}
+function closeMo(id) {
+  document.getElementById(id)?.classList.remove('show');
+}
 function bgCloseMo(id, e) { if (e.target===document.getElementById(id)) closeMo(id); }
+window.addEventListener('popstate', () => {
+  document.querySelectorAll('.mo.show').forEach(el => el.classList.remove('show'));
+  document.getElementById('auth-mo')?.classList.add('hide');
+  document.getElementById('adm-panel')?.classList.remove('show');
+});
 
 // ══════ PHOTO PREVIEW ══════
 function previewPhoto(inp, prevId, areaId) {
