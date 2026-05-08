@@ -609,20 +609,18 @@ function hideSplash() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  fillWilayas('r-wilaya');
-  fillWilayas('add-wilaya');
-  fillAddCats();
-  buildCats();
-  setupOtp('l-otp-row');
-  setupOtp('r-otp-row');
-  document.getElementById('adm-wa-inp').value = S.adminWA;
-
-  // إخفاء Splash بعد 2.5 ثانية مهما حدث
+  // إخفاء Splash بعد 2.5 ثانية مهما حدث — يجب أن يكون أول شيء
   const splashTimer = setTimeout(hideSplash, 2500);
-
-  await loadSession();
-  await loadListings();
-
+  try {
+    fillWilayas('r-wilaya');
+    buildCats();
+    setupOtp('l-otp-row');
+    setupOtp('r-otp-row');
+    const wa = document.getElementById('adm-wa-inp');
+    if (wa) wa.value = S.adminWA;
+    await loadSession();
+    await loadListings();
+  } catch(e) { console.error('init error:', e); }
   clearTimeout(splashTimer);
   hideSplash();
 });
