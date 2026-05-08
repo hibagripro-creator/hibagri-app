@@ -536,7 +536,8 @@ const SUPA_URL = 'https://bxcllhikeokcabzchgly.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4Y2xsaGlrZW9rY2FiemNoZ2x5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzc0NTMsImV4cCI6MjA5MjcxMzQ1M30.u6v9gIUf9eiksJc_6fCEuinWOCPyRXAgjS444xCw6Sg';
 const ADMIN_CODE = 'HIBAGRI2025';
 const OTP = '123456';
-const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+let supa = null;
+try { supa = supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) { console.warn('Supabase CDN not ready:', e); }
 
 // ══════ STATE ══════
 let S = {
@@ -567,6 +568,11 @@ const UNITS = {day:'/ يوم', week:'/ أسبوع', month:'/ شهر', trip:'/ ر
 const WILAYAS = ['01 أدرار','02 الشلف','03 الأغواط','04 أم البواقي','05 باتنة','06 بجاية','07 بسكرة','08 بشار','09 البليدة','10 البويرة','11 تمنراست','12 تبسة','13 تلمسان','14 تيارت','15 تيزي وزو','16 الجزائر','17 الجلفة','18 جيجل','19 سطيف','20 سعيدة','21 سكيكدة','22 سيدي بلعباس','23 عنابة','24 قالمة','25 قسنطينة','26 المدية','27 مستغانم','28 المسيلة','29 معسكر','30 ورقلة','31 وهران','32 البيض','33 إليزي','34 برج بوعريريج','35 بومرداس','36 الطارف','37 تندوف','38 تيسمسيلت','39 الوادي','40 خنشلة','41 سوق أهراس','42 تيبازة','43 ميلة','44 عين الدفلى','45 النعامة','46 عين تموشنت','47 غرداية','48 غليزان','49 المغير','50 المنيعة','51 أولاد جلال','52 برج باجي مختار','53 بني عباس','54 تيميمون','55 توقرت','56 جانت','57 عين صالح','58 عين قزام'];
 
 // ══════ INIT ══════
+function hideSplash() {
+  document.getElementById('splash')?.classList.add('hide');
+  document.getElementById('app')?.removeAttribute('hidden');
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   fillWilayas('r-wilaya');
   fillWilayas('add-wilaya');
@@ -575,10 +581,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupOtp('l-otp-row');
   setupOtp('r-otp-row');
   document.getElementById('adm-wa-inp').value = S.adminWA;
+
+  // إخفاء Splash بعد 2.5 ثانية مهما حدث
+  const splashTimer = setTimeout(hideSplash, 2500);
+
   await loadSession();
   await loadListings();
-  setTimeout(() => document.getElementById('splash').classList.add('hide'), 1000);
-  document.getElementById('app').removeAttribute('hidden');
+
+  clearTimeout(splashTimer);
+  hideSplash();
 });
 
 function fillWilayas(selId) {
@@ -602,11 +613,18 @@ function buildCats() {
 // ══════ SESSION ══════
 async function loadSession() {
   const ph = localStorage.getItem('hb_ph');
-  if (!ph) return;
+  if (!ph || !supa) return;
   try {
-    const {data} = await supa.from('profiles').select('*').eq('phone', ph).single();
+    const {data} = await withTimeout(supa.from('profiles').select('*').eq('phone', ph).single(), 8000);
     if (data) { S.user = data; S.isAdmin = !!data.is_admin; }
   } catch(e) {}
+}
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
+  ]);
 }
 
 // ══════ AUTH ══════
@@ -629,15 +647,17 @@ function switchAuthTab(tab) {
 }
 
 async function loginStep() {
+  if (!supa) { toast('لا يوجد اتصال بقاعدة البيانات','err'); return; }
   const btn = document.getElementById('l-btn');
   if (!S.loginOtpSent) {
     const ph = document.getElementById('l-phone').value.trim();
     if (ph.length < 9) { toast('أدخل رقم هاتف صحيح','err'); return; }
     btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ...';
     try {
-      const {data} = await supa.from('profiles').select('id').eq('phone', ph).maybeSingle();
-      if (!data) { toast('رقم الهاتف غير مسجل — أنشئ حساباً','err'); btn.disabled=false; return; }
-    } catch(e) { toast('خطأ في الاتصال','err'); btn.disabled=false; return; }
+      const {data} = await withTimeout(supa.from('profiles').select('id').eq('phone', ph).maybeSingle(), 8000);
+      if (!data) { toast('رقم الهاتف غير مسجل — أنشئ حساباً','err'); btn.disabled=false; btn.innerHTML='<i class="fas fa-arrow-left"></i> متابعة'; return; }
+    } catch(e) { toast('خطأ في الاتصال: '+e.message,'err'); btn.disabled=false; btn.innerHTML='<i class="fas fa-arrow-left"></i> متابعة'; return; }
     document.getElementById('l-otp-wrap').style.display = 'block';
     btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
     btn.disabled = false;
@@ -647,15 +667,19 @@ async function loginStep() {
     const code = otpVal('l-otp-row');
     if (code !== OTP) { toast('رمز التحقق خاطئ','err'); return; }
     btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     const ph = document.getElementById('l-phone').value.trim();
-    const {data} = await supa.from('profiles').select('*').eq('phone', ph).single();
-    if (data) {
-      S.user = data; S.isAdmin = !!data.is_admin;
-      localStorage.setItem('hb_ph', ph);
-      hideAuth();
-      toast('مرحباً ' + (data.name||'') + ' 👋','ok');
-    }
+    try {
+      const {data} = await withTimeout(supa.from('profiles').select('*').eq('phone', ph).single(), 8000);
+      if (data) {
+        S.user = data; S.isAdmin = !!data.is_admin;
+        localStorage.setItem('hb_ph', ph);
+        hideAuth();
+        toast('مرحباً ' + (data.name||'') + ' 👋','ok');
+      }
+    } catch(e) { toast('خطأ في الاتصال','err'); }
     btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
   }
 }
 
@@ -692,6 +716,7 @@ function updateDots(step) {
 }
 
 async function submitReg() {
+  if (!supa) { toast('لا يوجد اتصال بقاعدة البيانات','err'); return; }
   if (otpVal('r-otp-row') !== OTP) { toast('رمز التحقق خاطئ','err'); return; }
   const btn = document.getElementById('reg-btn');
   btn.disabled = true;
@@ -702,35 +727,40 @@ async function submitReg() {
   const wil   = document.getElementById('r-wilaya').value;
   const nid   = document.getElementById('r-nid').value.trim();
   try {
-    const {data:ex} = await supa.from('profiles').select('id').eq('phone', phone).maybeSingle();
+    const {data:ex} = await withTimeout(supa.from('profiles').select('id').eq('phone', phone).maybeSingle(), 8000);
     if (ex) { toast('هذا الهاتف مسجل مسبقاً — سجّل الدخول','err'); btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i> إنشاء الحساب'; return; }
   } catch(e) {}
-  const {error} = await supa.from('profiles').insert({
-    phone, name, wilaya: wil, email, nid_number: nid,
-    is_subscribed: false, is_verified: false, is_admin: false, account_type: 'user'
-  });
-  if (error) {
-    toast('خطأ: '+(error.message||JSON.stringify(error)),'err');
-    btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i> إنشاء الحساب'; return;
+  try {
+    const {error} = await withTimeout(supa.from('profiles').insert({
+      phone, name, wilaya: wil, email, nid_number: nid,
+      is_subscribed: false, is_verified: false, is_admin: false, account_type: 'user'
+    }), 10000);
+    if (error) throw new Error(error.message || JSON.stringify(error));
+    const {data} = await withTimeout(supa.from('profiles').select('*').eq('phone', phone).single(), 8000);
+    S.user = data; S.isAdmin = false;
+    localStorage.setItem('hb_ph', phone);
+    hideAuth();
+    toast('تم إنشاء حسابك بنجاح! 🎉','ok');
+  } catch(e) {
+    toast('خطأ: '+e.message,'err');
   }
-  const {data} = await supa.from('profiles').select('*').eq('phone', phone).single();
-  S.user = data; S.isAdmin = false;
-  localStorage.setItem('hb_ph', phone);
-  hideAuth();
-  toast('تم إنشاء حسابك! 🎉','ok');
   btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i> إنشاء الحساب';
 }
 
 // ══════ LISTINGS ══════
 async function loadListings() {
   showSkels();
+  if (!supa) { S.listings = []; renderListings(); toast('الاتصال بقاعدة البيانات غير متاح','err'); return; }
   try {
-    const {data,error} = await supa.from('listings').select('*').order('created_at',{ascending:false});
+    const {data,error} = await withTimeout(
+      supa.from('listings').select('*').order('created_at',{ascending:false}),
+      10000
+    );
     if (error) throw error;
     S.listings = (data||[]).filter(l => !l.status || l.status === 'active');
   } catch(e) {
     S.listings = [];
-    toast('تعذّر تحميل الإعلانات — تحقق من الاتصال','err');
+    if (e.message !== 'timeout') toast('تعذّر تحميل الإعلانات — تحقق من الاتصال','err');
   }
   renderListings();
 }
