@@ -780,10 +780,9 @@ function showSkels() {
 function renderListings() {
   const q = (document.getElementById('srch-input')?.value||'').toLowerCase().trim();
   let items = S.listings;
-  if (S.category) items = items.filter(l => l.category === S.category);
+  if (S.category) items = items.filter(l => l.cat === S.category);
   if (q) items = items.filter(l =>
-    (l.title||'').toLowerCase().includes(q) ||
-    (l.description||'').toLowerCase().includes(q) ||
+    (l.name||'').toLowerCase().includes(q) ||
     (l.wilaya||'').toLowerCase().includes(q)
   );
   const cat = CATS.find(c=>c.id===S.category);
@@ -798,8 +797,8 @@ function renderListings() {
 }
 
 function cardHTML(l) {
-  const c = CMAP[l.category]||{emoji:'📦',label:l.category||''};
-  const u = UNITS[l.price_unit]||'';
+  const c = CMAP[l.cat]||{emoji:'📦',label:l.cat||''};
+  const u = UNITS[l.unit]||'';
   return `
   <div class="card" onclick="openDetail('${l.id}')">
     <div class="card-img">
@@ -809,10 +808,10 @@ function cardHTML(l) {
       <button class="cfav${S.favs.has(l.id)?' on':''}" onclick="toggleFav(event,'${l.id}')"><i class="fas fa-heart"></i></button>
     </div>
     <div class="cbody">
-      <div class="ctitle">${h(l.title||'')}</div>
+      <div class="ctitle">${h(l.name||'')}</div>
       <div class="cloc"><i class="fas fa-map-marker-alt"></i>${h(l.wilaya||'')}</div>
       <div><span class="cprice">${Number(l.price||0).toLocaleString('ar-DZ')} دج</span> <span class="cunit">${u}</span></div>
-      <button class="cwa" onclick="waCall(event,'${h(l.owner_phone||l.phone||'')}','${h(l.title||'')}')">
+      <button class="cwa" onclick="waCall(event,'${h(l.owner_phone||l.phone||'')}','${h(l.name||'')}')">
         <i class="fab fa-whatsapp"></i> تواصل
       </button>
     </div>
@@ -837,8 +836,8 @@ function toggleFav(e, id) {
 async function openDetail(id) {
   const l = S.listings.find(x=>String(x.id)===String(id));
   if (!l) return;
-  const c = CMAP[l.category]||{emoji:'📦',label:''};
-  const u = UNITS[l.price_unit]||'';
+  const c = CMAP[l.cat]||{emoji:'📦',label:l.cat||''};
+  const u = UNITS[l.unit]||'';
   let ownerHtml = '';
   try {
     const ph = l.owner_phone || l.phone || '';
@@ -862,19 +861,20 @@ async function openDetail(id) {
       <span style="${l.image_url?'position:absolute;z-index:0;opacity:.15':'font-size:5rem'}">${c.emoji}</span>
     </div>
     <div class="det-bd">
-      <div class="det-title">${h(l.title||'')}</div>
+      <div class="det-title">${h(l.name||'')}</div>
       <div class="det-metas">
         <span class="dm"><i class="fas fa-tag"></i>${c.label}</span>
         <span class="dm"><i class="fas fa-map-marker-alt"></i>${h(l.wilaya||'')}</span>
         ${l.address?`<span class="dm"><i class="fas fa-location-dot"></i>${h(l.address)}</span>`:''}
+        ${l.from_city&&l.to_city?`<span class="dm"><i class="fas fa-route"></i>${h(l.from_city)} ← ${h(l.to_city)}</span>`:''}
+        ${l.capacity?`<span class="dm"><i class="fas fa-weight-hanging"></i>${h(String(l.capacity))}</span>`:''}
       </div>
       <div class="det-pbox">
         <div class="det-price">${Number(l.price||0).toLocaleString('ar-DZ')} دج</div>
         <div class="det-punit">${u}</div>
       </div>
-      ${l.description?`<div class="det-desc">${h(l.description)}</div>`:''}
       ${ownerHtml}
-      <button class="btn btn-wa" onclick="waCall(null,'${h(l.owner_phone||l.phone||'')}','${h(l.title||'')}')">
+      <button class="btn btn-wa" onclick="waCall(null,'${h(l.owner_phone||l.phone||'')}','${h(l.name||'')}')">
         <i class="fab fa-whatsapp"></i> تواصل مع المُعلِن عبر واتساب
       </button>
       <button class="btn btn-o mt1" onclick="closeMo('det-mo')">إغلاق</button>
@@ -948,10 +948,10 @@ async function submitListing() {
   if (!price||isNaN(price)) { toast('أدخل السعر','err'); return; }
   if (!wil) { toast('اختر الولاية','err'); return; }
   const {error} = await supa.from('listings').insert({
-    title, category: cat, price: Number(price), price_unit: unit,
-    wilaya: wil, description: desc||null, address: addr||null,
+    name: title, cat: cat, price: Number(price), unit: unit,
+    wilaya: wil, address: addr||null,
     owner_phone: S.user.phone, phone: phone||S.user.phone,
-    status: 'active', image_url: null,
+    owner_name: S.user.name||'', status: 'active', image_url: null,
   });
   if (error) { toast('خطأ في النشر: '+(error.message||''),'err'); return; }
   toast('تم نشر إعلانك بنجاح! 🎉','ok');
@@ -1035,11 +1035,11 @@ async function loadMyListings() {
     const {data} = await supa.from('listings').select('*').eq('owner_phone',S.user.phone).order('created_at',{ascending:false});
     if (!data?.length) { el.innerHTML='<p style="text-align:center;color:var(--muted);padding:1rem">لا توجد إعلانات بعد</p>'; return; }
     el.innerHTML = data.map(l => {
-      const c = CMAP[l.category]||{emoji:'📦'};
+      const c = CMAP[l.cat]||{emoji:'📦'};
       return `<div class="mini-card">
         <div class="mini-ico">${c.emoji}</div>
         <div class="mini-info">
-          <div class="mini-title">${h(l.title||'')}</div>
+          <div class="mini-title">${h(l.name||'')}</div>
           <div class="mini-sub">${h(l.wilaya||'')} · <span style="color:${l.status==='active'?'var(--green)':'var(--muted)'}">${l.status==='active'?'نشط':'معلق'}</span></div>
         </div>
         <div class="mini-price">${Number(l.price||0).toLocaleString('ar-DZ')}</div>
@@ -1162,13 +1162,13 @@ function renderAdmListings(lists) {
   const el = document.getElementById('atc-listings');
   if (!lists.length) { el.innerHTML='<p style="text-align:center;padding:2rem;color:var(--muted)">لا توجد إعلانات</p>'; return; }
   el.innerHTML = lists.map(l=>{
-    const c = CMAP[l.category]||{emoji:'📦',label:l.category||''};
+    const c = CMAP[l.cat]||{emoji:'📦',label:l.cat||''};
     const st = l.status||'active';
     return `<div class="lrow">
       <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.45rem">
         <span style="font-size:1.4rem">${c.emoji}</span>
         <div style="flex:1;min-width:0">
-          <div style="font-weight:700;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${h(l.title||'')}</div>
+          <div style="font-weight:700;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${h(l.name||'')}</div>
           <div style="font-size:.72rem;color:var(--muted)">${h(l.owner_phone||l.phone||'')} · ${h(l.wilaya||'')}</div>
         </div>
         <span class="bdg ${st==='active'?'bdg-act':st==='rejected'?'bdg-rej':'bdg-off'}">${st==='active'?'نشط':st==='rejected'?'مرفوض':'معلق'}</span>
