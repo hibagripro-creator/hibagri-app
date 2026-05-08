@@ -766,6 +766,7 @@ async function submitReg() {
   } catch(e) {}
   try {
     const {error} = await withTimeout(db.insert('profiles', {
+      id: crypto.randomUUID(),
       phone, name, wilaya: wil, email, nid_number: nid,
       is_subscribed: false, is_verified: false, is_admin: false, account_type: 'user'
     }), 10000);
@@ -975,6 +976,7 @@ async function submitListing() {
   if (!price||isNaN(price)) { toast('أدخل السعر','err'); return; }
   if (!wil) { toast('اختر الولاية','err'); return; }
   const {error} = await db.insert('listings', {
+    id: crypto.randomUUID(),
     name: title, cat: cat, price: Number(price), unit: unit,
     wilaya: wil, address: addr||null,
     owner_phone: S.user.phone, phone: phone||S.user.phone,
