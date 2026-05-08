@@ -7,7 +7,6 @@
 <title>هيباغري | سوق الكراء</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --p:#0a4520;--pl:#157a38;--pd:#062d15;
@@ -536,8 +535,44 @@ const SUPA_URL = 'https://bxcllhikeokcabzchgly.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4Y2xsaGlrZW9rY2FiemNoZ2x5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzc0NTMsImV4cCI6MjA5MjcxMzQ1M30.u6v9gIUf9eiksJc_6fCEuinWOCPyRXAgjS444xCw6Sg';
 const ADMIN_CODE = 'HIBAGRI2025';
 const OTP = '123456';
-let supa = null;
-try { supa = supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e) { console.warn('Supabase CDN not ready:', e); }
+
+const _H = {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'};
+function _url(table, params) {
+  const u = new URL(SUPA_URL+'/rest/v1/'+table);
+  if (params) Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));
+  return u.toString();
+}
+const db = {
+  async select(table, cols, filters, order) {
+    const p={select:cols||'*'};
+    if (filters) Object.entries(filters).forEach(([k,v])=>{p[k]='eq.'+v;});
+    if (order) p.order=order;
+    try { const r=await fetch(_url(table,p),{headers:_H}); const d=await r.json(); return r.ok?{data:d,error:null}:{data:null,error:d}; }
+    catch(e){return{data:null,error:{message:e.message}};}
+  },
+  async selectOne(table, cols, filters) {
+    const p={select:cols||'*',limit:'1'};
+    if (filters) Object.entries(filters).forEach(([k,v])=>{p[k]='eq.'+v;});
+    try { const r=await fetch(_url(table,p),{headers:_H}); const d=await r.json(); return r.ok?{data:(d[0]||null),error:null}:{data:null,error:d}; }
+    catch(e){return{data:null,error:{message:e.message}};}
+  },
+  async insert(table, body) {
+    try { const r=await fetch(_url(table),{method:'POST',headers:{..._H,'Prefer':'return=representation'},body:JSON.stringify(body)}); const d=await r.json(); return r.ok?{data:d,error:null}:{error:d}; }
+    catch(e){return{error:{message:e.message}};}
+  },
+  async update(table, body, filters) {
+    const p={};
+    if (filters) Object.entries(filters).forEach(([k,v])=>{p[k]='eq.'+v;});
+    try { const r=await fetch(_url(table,p),{method:'PATCH',headers:{..._H,'Prefer':'return=representation'},body:JSON.stringify(body)}); return r.ok?{error:null}:{error:await r.json()}; }
+    catch(e){return{error:{message:e.message}};}
+  },
+  async del(table, filters) {
+    const p={};
+    if (filters) Object.entries(filters).forEach(([k,v])=>{p[k]='eq.'+v;});
+    try { const r=await fetch(_url(table,p),{method:'DELETE',headers:_H}); return r.ok?{error:null}:{error:await r.json()}; }
+    catch(e){return{error:{message:e.message}};}
+  }
+};
 
 // ══════ STATE ══════
 let S = {
@@ -613,9 +648,9 @@ function buildCats() {
 // ══════ SESSION ══════
 async function loadSession() {
   const ph = localStorage.getItem('hb_ph');
-  if (!ph || !supa) return;
+  if (!ph) return;
   try {
-    const {data} = await withTimeout(supa.from('profiles').select('*').eq('phone', ph).single(), 8000);
+    const {data} = await withTimeout(db.selectOne('profiles', '*', {phone: ph}), 8000);
     if (data) { S.user = data; S.isAdmin = !!data.is_admin; }
   } catch(e) {}
 }
@@ -647,7 +682,6 @@ function switchAuthTab(tab) {
 }
 
 async function loginStep() {
-  if (!supa) { toast('لا يوجد اتصال بقاعدة البيانات','err'); return; }
   const btn = document.getElementById('l-btn');
   if (!S.loginOtpSent) {
     const ph = document.getElementById('l-phone').value.trim();
@@ -655,7 +689,7 @@ async function loginStep() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ...';
     try {
-      const {data} = await withTimeout(supa.from('profiles').select('id').eq('phone', ph).maybeSingle(), 8000);
+      const {data} = await withTimeout(db.selectOne('profiles', 'id', {phone: ph}), 8000);
       if (!data) { toast('رقم الهاتف غير مسجل — أنشئ حساباً','err'); btn.disabled=false; btn.innerHTML='<i class="fas fa-arrow-left"></i> متابعة'; return; }
     } catch(e) { toast('خطأ في الاتصال: '+e.message,'err'); btn.disabled=false; btn.innerHTML='<i class="fas fa-arrow-left"></i> متابعة'; return; }
     document.getElementById('l-otp-wrap').style.display = 'block';
@@ -670,7 +704,7 @@ async function loginStep() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     const ph = document.getElementById('l-phone').value.trim();
     try {
-      const {data} = await withTimeout(supa.from('profiles').select('*').eq('phone', ph).single(), 8000);
+      const {data} = await withTimeout(db.selectOne('profiles', '*', {phone: ph}), 8000);
       if (data) {
         S.user = data; S.isAdmin = !!data.is_admin;
         localStorage.setItem('hb_ph', ph);
@@ -716,7 +750,6 @@ function updateDots(step) {
 }
 
 async function submitReg() {
-  if (!supa) { toast('لا يوجد اتصال بقاعدة البيانات','err'); return; }
   if (otpVal('r-otp-row') !== OTP) { toast('رمز التحقق خاطئ','err'); return; }
   const btn = document.getElementById('reg-btn');
   btn.disabled = true;
@@ -727,16 +760,16 @@ async function submitReg() {
   const wil   = document.getElementById('r-wilaya').value;
   const nid   = document.getElementById('r-nid').value.trim();
   try {
-    const {data:ex} = await withTimeout(supa.from('profiles').select('id').eq('phone', phone).maybeSingle(), 8000);
+    const {data:ex} = await withTimeout(db.selectOne('profiles', 'id', {phone: phone}), 8000);
     if (ex) { toast('هذا الهاتف مسجل مسبقاً — سجّل الدخول','err'); btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i> إنشاء الحساب'; return; }
   } catch(e) {}
   try {
-    const {error} = await withTimeout(supa.from('profiles').insert({
+    const {error} = await withTimeout(db.insert('profiles', {
       phone, name, wilaya: wil, email, nid_number: nid,
       is_subscribed: false, is_verified: false, is_admin: false, account_type: 'user'
     }), 10000);
     if (error) throw new Error(error.message || JSON.stringify(error));
-    const {data} = await withTimeout(supa.from('profiles').select('*').eq('phone', phone).single(), 8000);
+    const {data} = await withTimeout(db.selectOne('profiles', '*', {phone: phone}), 8000);
     S.user = data; S.isAdmin = false;
     localStorage.setItem('hb_ph', phone);
     hideAuth();
@@ -750,13 +783,12 @@ async function submitReg() {
 // ══════ LISTINGS ══════
 async function loadListings() {
   showSkels();
-  if (!supa) { S.listings = []; renderListings(); toast('الاتصال بقاعدة البيانات غير متاح','err'); return; }
   try {
     const {data,error} = await withTimeout(
-      supa.from('listings').select('*').order('created_at',{ascending:false}),
+      db.select('listings', '*', null, 'created_at.desc'),
       10000
     );
-    if (error) throw error;
+    if (error) throw new Error(error.message||JSON.stringify(error));
     S.listings = (data||[]).filter(l => !l.status || l.status === 'active');
   } catch(e) {
     S.listings = [];
@@ -842,7 +874,7 @@ async function openDetail(id) {
   try {
     const ph = l.owner_phone || l.phone || '';
     if (ph) {
-      const {data:ow} = await supa.from('profiles').select('name,wilaya,is_verified').eq('phone',ph).maybeSingle();
+      const {data:ow} = await db.selectOne('profiles', 'name,wilaya,is_verified', {phone: ph});
       if (ow) ownerHtml = `
         <div class="det-owner">
           <div class="ow-av"><i class="fas fa-user"></i></div>
@@ -947,7 +979,7 @@ async function submitListing() {
   if (!title) { toast('أدخل عنوان الإعلان','err'); return; }
   if (!price||isNaN(price)) { toast('أدخل السعر','err'); return; }
   if (!wil) { toast('اختر الولاية','err'); return; }
-  const {error} = await supa.from('listings').insert({
+  const {error} = await db.insert('listings', {
     name: title, cat: cat, price: Number(price), unit: unit,
     wilaya: wil, address: addr||null,
     owner_phone: S.user.phone, phone: phone||S.user.phone,
@@ -1032,7 +1064,7 @@ async function loadMyListings() {
   const el = document.getElementById('my-lst');
   if (!el||!S.user) return;
   try {
-    const {data} = await supa.from('listings').select('*').eq('owner_phone',S.user.phone).order('created_at',{ascending:false});
+    const {data} = await db.select('listings', '*', {owner_phone: S.user.phone}, 'created_at.desc');
     if (!data?.length) { el.innerHTML='<p style="text-align:center;color:var(--muted);padding:1rem">لا توجد إعلانات بعد</p>'; return; }
     el.innerHTML = data.map(l => {
       const c = CMAP[l.cat]||{emoji:'📦'};
@@ -1050,7 +1082,7 @@ async function loadMyListings() {
 async function saveProfile() {
   const name = document.getElementById('edit-name')?.value.trim();
   const email = document.getElementById('edit-email')?.value.trim();
-  const {error} = await supa.from('profiles').update({name,email}).eq('phone',S.user.phone);
+  const {error} = await db.update('profiles', {name,email}, {phone: S.user.phone});
   if (error) { toast('خطأ في الحفظ','err'); return; }
   S.user.name=name; S.user.email=email;
   toast('تم حفظ التغييرات','ok');
@@ -1086,8 +1118,8 @@ function closeAdmin() { document.getElementById('adm-panel').classList.remove('s
 async function refreshAdminData() {
   try {
     const [{data:U},{data:L}] = await Promise.all([
-      supa.from('profiles').select('*').order('created_at',{ascending:false}),
-      supa.from('listings').select('*').order('created_at',{ascending:false}),
+      db.select('profiles', '*', null, 'created_at.desc'),
+      db.select('listings', '*', null, 'created_at.desc'),
     ]);
     const users=U||[], lists=L||[];
     document.getElementById('st-users').textContent = users.length;
@@ -1137,7 +1169,7 @@ function renderAdmUsers(users) {
 }
 
 async function toggleVerify(uid, val) {
-  const {error} = await supa.from('profiles').update({is_verified:val}).eq('id',uid);
+  const {error} = await db.update('profiles', {is_verified:val}, {id: uid});
   if (error) { toast('خطأ','err'); return; }
   toast(val?'تم التوثيق ✓':'تم إلغاء التوثيق','ok');
   await refreshAdminData();
@@ -1151,7 +1183,7 @@ async function toggleSub(uid, val) {
   } else {
     upd.subscription_end = null;
   }
-  const {error} = await supa.from('profiles').update(upd).eq('id',uid);
+  const {error} = await db.update('profiles', upd, {id: uid});
   if (error) { toast('خطأ','err'); return; }
   toast(val?'تم تفعيل الاشتراك (سنة)':'تم إلغاء الاشتراك','ok');
   if (S.user?.id===uid) { S.user.is_subscribed=val; S.user.subscription_end=upd.subscription_end||null; }
@@ -1182,14 +1214,14 @@ function renderAdmListings(lists) {
   }).join('');
 }
 async function setListStatus(id, status) {
-  await supa.from('listings').update({status}).eq('id',id);
+  await db.update('listings', {status}, {id: id});
   toast(status==='active'?'تم القبول':'تم الرفض','ok');
   await refreshAdminData();
   await loadListings();
 }
 async function delListing(id) {
   if (!confirm('هل تريد حذف هذا الإعلان نهائياً؟')) return;
-  await supa.from('listings').delete().eq('id',id);
+  await db.del('listings', {id: id});
   toast('تم الحذف','ok');
   await refreshAdminData();
   await loadListings();
